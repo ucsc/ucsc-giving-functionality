@@ -2,13 +2,14 @@
 /**
  * Plugin Name: UCSC Giving Functionality Plugin
  * Plugin URI: https://github.com/ucsc/ucsc-giving-functionality-plugin
- * Description: Adds custom functionality to UCSC WordPress Websites.
+ * Description: Adds custom functionality to UCSC Giving Website.
  * Version: 0.1.0
- * Requires at least: 6.1
+ * Requires at least: 6.5.0
  * Author: UC Santa Cruz
  * Author URI: https://github.com/ucsc
  * License: GPL3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
+ * Requires Plugin: advanced-custom-fields-pro
  * Text Domain: ucscgiving
  *
  * @package ucsc-giving-functionality
