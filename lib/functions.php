@@ -54,16 +54,17 @@ function ucscgiving_register_fund_url_block_binding() {
 }
 
 function ucscgiving_fund_url() {
-	$thirdpartylink = get_post_meta( get_the_ID(), '3rd_party_link', true );
+	$external = get_post_meta( get_the_ID(), 'external_giving_link', true );
 	$baseurl = 'https://give.ucsc.edu/campaigns/38026/donations/new?designation=';
 	$aqcode = get_post_meta( get_the_ID(), 'aq_code', true );
+	$fundurl = '';
 
-	if ( !empty($thirdpartylink) ) {
-		$fundurl = $thirdpartylink; 
+	if ( !empty($external) ) {
+		$fundurl = $external; 
 	} else if ( !empty($aqcode) ) {
 		$fundurl = $baseurl . $aqcode;
 	} else {
-			return null;
+		$fundurl = $baseurl;
 	}
 	
 	return esc_url( $fundurl );
