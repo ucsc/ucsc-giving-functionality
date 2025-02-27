@@ -16,7 +16,7 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "ID Default Value",
+            "default_value": "",
             "maxlength": "",
             "allow_in_bindings": 0,
             "placeholder": "",
@@ -37,7 +37,7 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "Code default value",
+            "default_value": "",
             "maxlength": "",
             "allow_in_bindings": 0,
             "placeholder": "",
@@ -58,7 +58,7 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "Form default value",
+            "default_value": "",
             "maxlength": "",
             "allow_in_bindings": 0,
             "placeholder": "",
@@ -67,7 +67,7 @@
         },
         {
             "key": "field_67bba72f21c54",
-            "label": "Fund button text",
+            "label": "Button text",
             "name": "button_text",
             "aria-label": "",
             "type": "text",
@@ -79,7 +79,7 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "Give text default value",
+            "default_value": "Give to UCSC",
             "maxlength": "",
             "allow_in_bindings": 0,
             "placeholder": "",
@@ -100,7 +100,7 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "AQ Code Default Value",
+            "default_value": "",
             "maxlength": "",
             "allow_in_bindings": 0,
             "placeholder": "",
@@ -109,8 +109,8 @@
         },
         {
             "key": "field_67be3a541fa9a",
-            "label": "3rd Party Link",
-            "name": "3rd_party_link",
+            "label": "External Giving Link",
+            "name": "external_giving_link",
             "aria-label": "",
             "type": "url",
             "instructions": "",
@@ -126,9 +126,9 @@
             "placeholder": ""
         },
         {
-            "key": "field_67bf958b869f8",
-            "label": "Area Key",
-            "name": "area_key",
+            "key": "field_67c085e712a5e",
+            "label": "Keywords Spreadsheet",
+            "name": "keywords_spreadsheet",
             "aria-label": "",
             "type": "text",
             "instructions": "",
@@ -139,12 +139,73 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "Default Area Key Value",
+            "default_value": "",
             "maxlength": "",
             "allow_in_bindings": 0,
             "placeholder": "",
             "prepend": "",
             "append": ""
+        },
+        {
+            "key": "field_67c0862d12a5f",
+            "label": "Area Spreadsheet",
+            "name": "area_spreadsheet",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_67c0d74e20f80",
+            "label": "Areas",
+            "name": "areas",
+            "aria-label": "",
+            "type": "checkbox",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "AG": "Area of Greatest Need",
+                "AE": "Alumni Engagement",
+                "AR": "Arts",
+                "AT": "Athletics",
+                "EN": "Baskin School of Engineering",
+                "CH": "Campus Infrastructure",
+                "CO": "Colleges",
+                "FR": "Friends Groups and Community Resources",
+                "HU": "Humanities",
+                "LI": "Libraries",
+                "PB": "Physical and Biological Sciences",
+                "RC": "Research Centers",
+                "SC": "Scholarship and Fellowships",
+                "SO": "Social Sciences",
+                "ST": "Student Life"
+            },
+            "default_value": [],
+            "return_format": "value",
+            "allow_custom": 0,
+            "allow_in_bindings": 0,
+            "layout": "vertical",
+            "toggle": 0,
+            "save_custom": 0,
+            "custom_choice_button_text": "Add new choice"
         }
     ],
     "location": [
@@ -165,5 +226,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1740609016
+    "modified": 1740691404
 }
