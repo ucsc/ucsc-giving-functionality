@@ -9,7 +9,8 @@
  * Author URI: https://github.com/ucsc
  * License: GPL3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
- * Requires Plugin: advanced-custom-fields-pro
+ * Update URI: https://github.com/ucsc/ucsc-giving-functionality-plugin/releases
+ * Requires Plugins: advanced-custom-fields-pro
  * Text Domain: ucscgiving
  *
  * @package ucsc-giving-functionality
