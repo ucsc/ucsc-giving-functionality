@@ -127,7 +127,7 @@ function ucscgiving_fund_columns_data( $column, $post_id ) {
 					_e( 'No causes', 'ucscgiving' );
 			break;
 		case 'format' :
-			echo get_post_format() ? : 'Priority';;
+			echo get_post_format() ? : 'Priority';
 			break;
 	}
 }
