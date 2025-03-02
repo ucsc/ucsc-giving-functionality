@@ -21,10 +21,7 @@ add_action( 'init', 'ucscgiving_register_text_meta' );
 
 function ucscgiving_register_text_meta() {
 	$fields = array(
-		'code' => 'Code',
-		'form' => 'Form',
 		'aq_code' => 'AQ_Code',
-		'id' => 'ID',
 		'button_text' => 'Fund button text',
 	);
 	foreach ($fields as $slug => $label) {
@@ -91,3 +88,46 @@ if ( ! function_exists( 'ucscgiving_link_filter' ) ){
 }
 add_filter('post_type_link', 'ucscgiving_link_filter', 10, 2);
 
+/**
+ * Customize Admin Columns for Fund Post Type
+ */
+// Register the columns
+add_filter( 'manage_fund_posts_columns', 'ucscgiving_fund_columns' );
+function ucscgiving_fund_columns( $columns ) {
+	$columns['area'] = __('Areas', 'ucsccgiving');
+	$columns['keyword'] = __('Keywords', 'ucsccgiving');
+	$columns['cause'] = __('Causes', 'ucsccgiving');
+	$columns['format'] = __('Format', 'ucsccgiving');
+	return $columns;
+}
+
+// Populate the columns
+add_action( 'manage_fund_posts_custom_column', 'ucscgiving_fund_columns_data', 10, 2 );
+function ucscgiving_fund_columns_data( $column, $post_id ) {
+	switch ( $column ) {
+		case 'area' :
+			$terms = get_the_term_list( $post_id , 'area' , '' , ',' , '' );
+			if ( is_string( $terms ) )
+					echo $terms;
+			else
+					_e( 'No areas', 'ucscgiving' );
+			break;
+		case 'keyword' :
+			$terms = get_the_term_list( $post_id , 'keyword' , '' , ',' , '' );
+			if ( is_string( $terms ) )
+					echo $terms;
+			else
+					_e( 'No keywords', 'ucscgiving' );
+			break;
+		case 'cause' :
+			$terms = get_the_term_list( $post_id , 'cause' , '' , ',' , '' );
+			if ( is_string( $terms ) )
+					echo $terms;
+			else
+					_e( 'No causes', 'ucscgiving' );
+			break;
+		case 'format' :
+			echo get_post_format() ? : 'Priority';;
+			break;
+	}
+}
