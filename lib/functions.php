@@ -3,6 +3,10 @@
  * General functions
  */
 
+/**
+ * Enable theme support for post formats
+ */
+add_theme_support( 'post-formats', array( 'link' ) );
 
 /**
  * Register custom ACF Text Meta Fields
@@ -54,14 +58,11 @@ function ucscgiving_register_fund_url_block_binding() {
 }
 
 function ucscgiving_fund_url() {
-	$external = get_post_meta( get_the_ID(), 'external_giving_link', true );
 	$baseurl = 'https://give.ucsc.edu/campaigns/38026/donations/new?designation=';
 	$aqcode = get_post_meta( get_the_ID(), 'aq_code', true );
 	$fundurl = '';
 
-	if ( !empty($external) ) {
-		$fundurl = $external; 
-	} else if ( !empty($aqcode) ) {
+	if ( !empty($aqcode) ) {
 		$fundurl = $baseurl . $aqcode;
 	} else {
 		$fundurl = $baseurl;
@@ -69,4 +70,24 @@ function ucscgiving_fund_url() {
 	
 	return esc_url( $fundurl );
 }
+
+/**
+*	Set permalinks to the external Giving URL  
+*/
+if ( ! function_exists( 'ucscgiving_link_filter' ) ){
+	function ucscgiving_link_filter($post_link, $post) {
+		$baseurl = 'https://give.ucsc.edu/campaigns/38026/donations/new?designation=';
+		$aqcode = get_post_meta( get_the_ID(), 'aq_code', true );
+		$fundurl = '';
+		if ( ( 'fund' === $post->post_type ) ) {
+			
+			if (has_post_format('link', $post)){
+				$fundurl = esc_attr($baseurl . $aqcode);
+				return $fundurl;
+			}
+		}
+		return $post_link;
+	}
+}
+add_filter('post_type_link', 'ucscgiving_link_filter', 10, 2);
 
