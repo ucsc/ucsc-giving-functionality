@@ -73,6 +73,8 @@ function ucscgiving_fund_url() {
 *	Set permalinks to the external Giving URL  
 */
 
+add_filter('post_type_link', 'ucscgiving_link_filter', 10, 2);
+
 function ucscgiving_link_filter($post_link, $post) {
 		$baseurl = get_field('base_url', 'option');
 		$aqcode = get_post_meta( get_the_ID(), 'aq_code', true );
@@ -86,7 +88,7 @@ function ucscgiving_link_filter($post_link, $post) {
 		}
 		return $post_link;
 }
-add_filter('post_type_link', 'ucscgiving_link_filter', 10, 2);
+
 
 /**
  * Customize Admin Columns for Fund Post Type
@@ -94,6 +96,7 @@ add_filter('post_type_link', 'ucscgiving_link_filter', 10, 2);
 
 // Register the columns
 add_filter( 'manage_fund_posts_columns', 'ucscgiving_fund_columns' );
+
 function ucscgiving_fund_columns( $columns ) {
 	$columns['format'] = __('Format', 'ucsccgiving');
 	return $columns;
@@ -101,18 +104,11 @@ function ucscgiving_fund_columns( $columns ) {
 
 // Populate the columns
 add_action( 'manage_fund_posts_custom_column', 'ucscgiving_fund_columns_data', 10, 2 );
+
 function ucscgiving_fund_columns_data( $column, $post_id ) {
 	switch ( $column ) {
 		case 'format' :
 			echo get_post_format() ? : 'standard';
 			break;
-	}
-}
-
-// add_action('wp_head', 'ucscgiving_test');
-function ucscgiving_test() {
-	$baseurl = get_field('base_url', 'option');
-	if ($baseurl) {
-		print_r($baseurl);
 	}
 }
