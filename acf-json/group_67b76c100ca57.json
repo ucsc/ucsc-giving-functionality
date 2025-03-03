@@ -16,7 +16,7 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "Give to UCSC",
+            "default_value": "Give now!",
             "maxlength": "",
             "allow_in_bindings": 0,
             "placeholder": "",
@@ -63,5 +63,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1740861929
+    "modified": 1740945696
 }

@@ -1,0 +1,43 @@
+{
+    "key": "group_67c4adfce3d52",
+    "title": "Giving",
+    "fields": [
+        {
+            "key": "field_67c4adfd5ff36",
+            "label": "Base URL",
+            "name": "base_url",
+            "aria-label": "",
+            "type": "url",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "https:\/\/give.ucsc.edu\/campaigns\/38026\/donations\/new?designation=",
+            "allow_in_bindings": 0,
+            "placeholder": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "ucsc-theme-options"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "modified": 1740954714
+}
