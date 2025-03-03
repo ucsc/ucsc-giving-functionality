@@ -45,6 +45,7 @@ function ucscgiving_register_text_meta() {
  * Registers a custom callback that concatenates
  * the Giving BASE url with the AQ_Code
  */
+
 add_action( 'init', 'ucscgiving_register_fund_url_block_binding' );
 
 function ucscgiving_register_fund_url_block_binding() {
@@ -55,7 +56,7 @@ function ucscgiving_register_fund_url_block_binding() {
 }
 
 function ucscgiving_fund_url() {
-	$baseurl = 'https://give.ucsc.edu/campaigns/38026/donations/new?designation=';
+	$baseurl = get_field('base_url', 'option');
 	$aqcode = get_post_meta( get_the_ID(), 'aq_code', true );
 	$fundurl = '';
 
@@ -71,9 +72,9 @@ function ucscgiving_fund_url() {
 /**
 *	Set permalinks to the external Giving URL  
 */
-if ( ! function_exists( 'ucscgiving_link_filter' ) ){
-	function ucscgiving_link_filter($post_link, $post) {
-		$baseurl = 'https://give.ucsc.edu/campaigns/38026/donations/new?designation=';
+
+function ucscgiving_link_filter($post_link, $post) {
+		$baseurl = get_field('base_url', 'option');
 		$aqcode = get_post_meta( get_the_ID(), 'aq_code', true );
 		$fundurl = '';
 		if ( ( 'fund' === $post->post_type ) ) {
@@ -84,19 +85,16 @@ if ( ! function_exists( 'ucscgiving_link_filter' ) ){
 			}
 		}
 		return $post_link;
-	}
 }
 add_filter('post_type_link', 'ucscgiving_link_filter', 10, 2);
 
 /**
  * Customize Admin Columns for Fund Post Type
  */
+
 // Register the columns
 add_filter( 'manage_fund_posts_columns', 'ucscgiving_fund_columns' );
 function ucscgiving_fund_columns( $columns ) {
-	$columns['area'] = __('Areas', 'ucsccgiving');
-	$columns['keyword'] = __('Keywords', 'ucsccgiving');
-	$columns['cause'] = __('Causes', 'ucsccgiving');
 	$columns['format'] = __('Format', 'ucsccgiving');
 	return $columns;
 }
@@ -105,29 +103,16 @@ function ucscgiving_fund_columns( $columns ) {
 add_action( 'manage_fund_posts_custom_column', 'ucscgiving_fund_columns_data', 10, 2 );
 function ucscgiving_fund_columns_data( $column, $post_id ) {
 	switch ( $column ) {
-		case 'area' :
-			$terms = get_the_term_list( $post_id , 'area' , '' , ',' , '' );
-			if ( is_string( $terms ) )
-					echo $terms;
-			else
-					_e( 'No areas', 'ucscgiving' );
-			break;
-		case 'keyword' :
-			$terms = get_the_term_list( $post_id , 'keyword' , '' , ',' , '' );
-			if ( is_string( $terms ) )
-					echo $terms;
-			else
-					_e( 'No keywords', 'ucscgiving' );
-			break;
-		case 'cause' :
-			$terms = get_the_term_list( $post_id , 'cause' , '' , ',' , '' );
-			if ( is_string( $terms ) )
-					echo $terms;
-			else
-					_e( 'No causes', 'ucscgiving' );
-			break;
 		case 'format' :
-			echo get_post_format() ? : 'Priority';
+			echo get_post_format() ? : 'standard';
 			break;
+	}
+}
+
+// add_action('wp_head', 'ucscgiving_test');
+function ucscgiving_test() {
+	$baseurl = get_field('base_url', 'option');
+	if ($baseurl) {
+		print_r($baseurl);
 	}
 }
