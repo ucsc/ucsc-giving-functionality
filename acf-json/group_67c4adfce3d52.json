@@ -1,6 +1,6 @@
 {
     "key": "group_67c4adfce3d52",
-    "title": "Giving",
+    "title": "Giving options",
     "fields": [
         {
             "key": "field_67c4adfd5ff36",
@@ -37,7 +37,7 @@
     "instruction_placement": "label",
     "hide_on_screen": "",
     "active": true,
-    "description": "",
-    "show_in_rest": 0,
-    "modified": 1740954714
+    "description": "Options for the Giving site",
+    "show_in_rest": 1,
+    "modified": 1741046268
 }

@@ -24,7 +24,7 @@ function ucscgiving_register_text_meta() {
 		'aq_code' => 'AQ_Code',
 		'button_text' => 'Fund button text',
 	);
-	foreach ($fields as $slug => $label) {
+	foreach ( $fields as $slug => $label ) {
 		register_post_meta(
 			'fund',
 			$slug,
@@ -33,7 +33,7 @@ function ucscgiving_register_text_meta() {
 				'single'            => true,
 				'type'              => 'string',
 				'sanitize_callback' => 'wp_strip_all_tags',
-				'label'							=> _($label),
+				'label'							=> _( $label ),
 			)
 		);
 	}
@@ -70,8 +70,8 @@ function ucscgiving_fund_url() {
 }
 
 /**
-*	Set permalinks to the external Giving URL  
-*/
+ * Set permalinks to the external Giving URL  
+ */
 
 add_filter('post_type_link', 'ucscgiving_link_filter', 10, 2);
 
@@ -96,6 +96,7 @@ function ucscgiving_link_filter($post_link, $post) {
 
 // Register the columns
 add_filter( 'manage_fund_posts_columns', 'ucscgiving_fund_columns' );
+// add_filter( 'manage_edit-fund_sortable_columns', 'ucscgiving_fund_columns' );
 
 function ucscgiving_fund_columns( $columns ) {
 	$columns['format'] = __('Format', 'ucsccgiving');

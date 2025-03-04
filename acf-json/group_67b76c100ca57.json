@@ -61,7 +61,7 @@
     "instruction_placement": "label",
     "hide_on_screen": "",
     "active": true,
-    "description": "",
-    "show_in_rest": 0,
-    "modified": 1740945696
+    "description": "Additional metadata for Giving funds.",
+    "show_in_rest": 1,
+    "modified": 1741023670
 }
