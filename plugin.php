@@ -30,3 +30,11 @@ function ucscgiving_acf_json_save_point( $path ) {
 	$path = UCSC_GIVING_PLUGIN_DIR . 'acf-json';
 	return $path;
 }
+
+// Set plugin directory for loading ACF JSON files
+add_filter('acf/settings/load_json', 'ucscgiving_acf_json_load_point');
+function ucscgiving_acf_json_load_point( $paths ) {
+	unset($paths[0]);
+	$paths[] = UCSC_GIVING_PLUGIN_DIR . 'acf-json';
+	return $paths;
+}
