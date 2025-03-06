@@ -16,7 +16,7 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "Give now!",
+            "default_value": "Give now",
             "maxlength": "",
             "allow_in_bindings": 0,
             "placeholder": "",
@@ -25,8 +25,8 @@
         },
         {
             "key": "field_67b8aad1bf8dc",
-            "label": "AQ_Code",
-            "name": "aq_code",
+            "label": "AQ Code",
+            "name": "designation",
             "aria-label": "",
             "type": "text",
             "instructions": "",
@@ -38,7 +38,7 @@
                 "id": ""
             },
             "default_value": "",
-            "maxlength": "",
+            "maxlength": 50,
             "allow_in_bindings": 0,
             "placeholder": "",
             "prepend": "",
@@ -63,5 +63,5 @@
     "active": true,
     "description": "Additional metadata for Giving funds.",
     "show_in_rest": 1,
-    "modified": 1741023670
+    "modified": 1741198768
 }
