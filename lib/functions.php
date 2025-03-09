@@ -74,7 +74,7 @@ add_filter('post_type_link', 'ucscgiving_link_filter', 10, 2);
 function ucscgiving_link_filter($post_link, $post) {
 		$baseurl = get_field('base_url', 'option');
 		$designation = get_post_meta( get_the_ID(), 'designation', true );
-		$termID = get_field('priority-fund');
+		$termID = get_field('type-of-fund');
 		$term = get_term($termID);
 		$fundurl = '';
 		if ( ( 'fund' === $post->post_type ) ) {
