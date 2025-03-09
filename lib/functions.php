@@ -78,7 +78,6 @@ function ucscgiving_link_filter($post_link, $post) {
 		$term = get_term($termID);
 		$fundurl = '';
 		if ( ( 'fund' === $post->post_type ) ) {
-			
 			if( ! is_wp_error( $term ) ) {
 				$term_name = $term->name;
 				if ($term_name === 'Link') {
