@@ -37,7 +37,7 @@
         "item_link": "Area Link",
         "item_link_description": "A link to a area"
     },
-    "description": "",
+    "description": "Taxonomy for Giving Areas",
     "capabilities": {
         "manage_terms": "manage_categories",
         "edit_terms": "manage_categories",
@@ -71,5 +71,5 @@
     "meta_box": "default",
     "meta_box_cb": "",
     "meta_box_sanitize_cb": "",
-    "modified": 1740944772
+    "modified": 1741549393
 }

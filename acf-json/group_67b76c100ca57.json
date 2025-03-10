@@ -3,6 +3,32 @@
     "title": "Fund Details",
     "fields": [
         {
+            "key": "field_67cc7f695ce26",
+            "label": "Type of Fund",
+            "name": "type-of-fund",
+            "aria-label": "",
+            "type": "taxonomy",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "taxonomy": "fund-type",
+            "add_term": 0,
+            "save_terms": 1,
+            "load_terms": 1,
+            "return_format": "id",
+            "field_type": "radio",
+            "allow_null": 1,
+            "allow_in_bindings": 0,
+            "bidirectional": 0,
+            "multiple": 0,
+            "bidirectional_target": []
+        },
+        {
             "key": "field_67bba72f21c54",
             "label": "Button text",
             "name": "button_text",
@@ -63,5 +89,5 @@
     "active": true,
     "description": "Additional metadata for Giving funds.",
     "show_in_rest": 1,
-    "modified": 1741198768
+    "modified": 1741550652
 }
