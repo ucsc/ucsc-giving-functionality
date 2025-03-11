@@ -23,7 +23,7 @@
             "return_format": "id",
             "field_type": "radio",
             "allow_null": 1,
-            "allow_in_bindings": 0,
+            "allow_in_bindings": 1,
             "bidirectional": 0,
             "multiple": 0,
             "bidirectional_target": []
@@ -31,7 +31,7 @@
         {
             "key": "field_67bba72f21c54",
             "label": "Button text",
-            "name": "button_text",
+            "name": "button-text",
             "aria-label": "",
             "type": "text",
             "instructions": "",
@@ -44,7 +44,7 @@
             },
             "default_value": "Give now",
             "maxlength": "",
-            "allow_in_bindings": 0,
+            "allow_in_bindings": 1,
             "placeholder": "",
             "prepend": "",
             "append": ""
@@ -89,5 +89,5 @@
     "active": true,
     "description": "Additional metadata for Giving funds.",
     "show_in_rest": 1,
-    "modified": 1741550652
+    "modified": 1741708281
 }
