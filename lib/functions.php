@@ -3,36 +3,6 @@
  * General functions
  */
 
-/**
- * Register custom ACF Text Meta Fields for Block binding
- *
- * Fields are defined in the ACF UI in the WP Dashboard
- * but as of WP 6.7.0, they still need to also be registered
- * in code to be available in the REST API. This will not be
- * necessary in future versions of WP.
- */
-
-add_action( 'init', 'ucscgiving_register_text_meta' );
-
-function ucscgiving_register_text_meta() {
-	$fields = array(
-		'button_text' => 'Fund button text',
-	);
-	foreach ( $fields as $slug => $label ) {
-		register_post_meta(
-			'fund',
-			$slug,
-			array(
-				'show_in_rest'      => true,
-				'single'            => true,
-				'type'              => 'string',
-				'sanitize_callback' => 'wp_strip_all_tags',
-				'label'							=> _( $label ),
-			)
-		);
-	}
-}
-
 /** 
  * Register Custom Block Binding Source
  *
@@ -80,7 +50,7 @@ function ucscgiving_link_filter($post_link, $post) {
 		if ( ( 'fund' === $post->post_type ) ) {
 			if( ! is_wp_error( $term ) ) {
 				$term_name = $term->name;
-				if ($term_name === 'Link') {
+				if ($term_name === 'Standard') {
 					if ( !empty( $baseurl ) && !empty( $designation ) ) { 
 						$fundurl = esc_attr($baseurl . $designation);
 					} else if ( !empty( $baseurl ) ) {
