@@ -44,13 +44,13 @@ add_filter('post_type_link', 'ucscgiving_link_filter', 10, 2);
 function ucscgiving_link_filter($post_link, $post) {
 		$baseurl = get_field('base_url', 'option');
 		$designation = get_post_meta( get_the_ID(), 'designation', true );
-		$termID = get_field('type-of-fund');
-		$term = get_term($termID);
+		$fundID = get_field('type-of-fund');
+		$fund = get_term($fundID);
 		$fundurl = '';
 		if ( ( 'fund' === $post->post_type ) ) {
-			if( ! is_wp_error( $term ) ) {
-				$term_name = $term->name;
-				if ($term_name === 'Standard') {
+			if( ! is_wp_error( $fund ) ) {
+				$fundname = $fund->name;
+				if ($fundname === 'Standard') {
 					if ( !empty( $baseurl ) && !empty( $designation ) ) { 
 						$fundurl = esc_attr($baseurl . $designation);
 					} else if ( !empty( $baseurl ) ) {
