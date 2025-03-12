@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: UCSC Giving Functionality Plugin
+ * Plugin Name: UCSC Giving Functionality
  * Plugin URI: https://github.com/ucsc/ucsc-giving-functionality-plugin
  * Description: Adds custom functionality to UCSC Giving Website.
  * Version: 0.1.0
