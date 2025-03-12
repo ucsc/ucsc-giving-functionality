@@ -16,25 +16,25 @@
  * @package ucsc-giving-functionality
  */
 
-//Set plugin directory
+// Set plugin directory.
 define( 'UCSC_GIVING_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
-// Include files
-if (file_exists(UCSC_GIVING_PLUGIN_DIR . 'lib/functions.php')) {
+// Include files.
+if ( file_exists( UCSC_GIVING_PLUGIN_DIR . 'lib/functions.php' ) ) {
 	require_once UCSC_GIVING_PLUGIN_DIR . 'lib/functions.php';
 }
 
-// Set plugin directory for syncing ACF JSON files
-add_filter('acf/settings/save_json', 'ucscgiving_acf_json_save_point');	
+// Set plugin directory for syncing ACF JSON files.
+add_filter( 'acf/settings/save_json', 'ucscgiving_acf_json_save_point' );
 function ucscgiving_acf_json_save_point( $path ) {
 	$path = UCSC_GIVING_PLUGIN_DIR . 'acf-json';
 	return $path;
 }
 
-// Set plugin directory for loading ACF JSON files
-add_filter('acf/settings/load_json', 'ucscgiving_acf_json_load_point');
+// Set plugin directory for loading ACF JSON files.
+add_filter( 'acf/settings/load_json', 'ucscgiving_acf_json_load_point' );
 function ucscgiving_acf_json_load_point( $paths ) {
-	unset($paths[0]);
+	unset( $paths[0] );
 	$paths[] = UCSC_GIVING_PLUGIN_DIR . 'acf-json';
 	return $paths;
 }
