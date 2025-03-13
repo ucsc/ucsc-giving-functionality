@@ -1,6 +1,10 @@
 <?php
 /**
  * General functions
+ *
+ * This file contains general functions for the UCSC Giving Functionality Plugin
+ *
+ * @since 1.0.0
  * @package ucsc-giving-functionality
  */
 
