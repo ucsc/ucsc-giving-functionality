@@ -19,9 +19,13 @@
 // Set plugin directory.
 define( 'UCSC_GIVING_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
-// Include files.
+// Include general functions.
 if ( file_exists( UCSC_GIVING_PLUGIN_DIR . 'lib/functions.php' ) ) {
 	require_once UCSC_GIVING_PLUGIN_DIR . 'lib/functions.php';
+}
+// Include settings.
+if ( file_exists( UCSC_GIVING_PLUGIN_DIR . '/lib/settings.php' ) ) {
+	include_once UCSC_GIVING_PLUGIN_DIR . '/lib/settings.php';
 }
 
 // Set plugin directory for syncing ACF JSON files.
