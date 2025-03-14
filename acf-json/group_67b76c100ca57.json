@@ -4,8 +4,8 @@
     "fields": [
         {
             "key": "field_67cc7f695ce26",
-            "label": "Type of Fund",
-            "name": "type-of-fund",
+            "label": "Fund Type",
+            "name": "fund-type-term",
             "aria-label": "",
             "type": "taxonomy",
             "instructions": "",
@@ -42,7 +42,7 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "Give now",
+            "default_value": "Donate",
             "maxlength": "",
             "allow_in_bindings": 1,
             "placeholder": "",
@@ -51,7 +51,7 @@
         },
         {
             "key": "field_67b8aad1bf8dc",
-            "label": "AQ Code",
+            "label": "Code",
             "name": "designation",
             "aria-label": "",
             "type": "text",
@@ -89,5 +89,5 @@
     "active": true,
     "description": "Additional metadata for Giving funds.",
     "show_in_rest": 1,
-    "modified": 1741811264
+    "modified": 1741893495
 }

@@ -54,7 +54,7 @@
     "rest_base": "",
     "rest_namespace": "wp\/v2",
     "rest_controller_class": "WP_REST_Terms_Controller",
-    "show_tagcloud": 1,
+    "show_tagcloud": 0,
     "show_in_quick_edit": 1,
     "show_admin_column": 1,
     "rewrite": {
@@ -74,5 +74,5 @@
     "meta_box": "default",
     "meta_box_cb": "",
     "meta_box_sanitize_cb": "",
-    "modified": 1741807436
+    "modified": 1741893415
 }
