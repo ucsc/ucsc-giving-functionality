@@ -52,7 +52,7 @@ add_filter( 'post_type_link', 'ucscgiving_link_filter', 10, 2 );
 function ucscgiving_link_filter( $post_link, $post ) {
 		$baseurl     = get_field( 'base_url', 'option' );
 		$designation = get_post_meta( get_the_ID(), 'designation', true );
-		$fundID      = get_field( 'type-of-fund' );
+		$fundID      = get_field( 'fund-type-term' );
 		$fund        = get_term( $fundID );
 		$fundurl     = '';
 	if ( ( 'fund' === $post->post_type ) ) {
