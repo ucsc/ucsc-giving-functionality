@@ -17,8 +17,8 @@
  */
 
 // Set plugin directory and base name.
-define( 'UCSC_GIVING_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'UCSC_GIVING_PLUGIN_BASE', plugin_basename( __FILE__ ) );
+define( 'UCSC_GIVING_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); // Path to plugin directory.
+define( 'UCSC_GIVING_PLUGIN_BASE', plugin_basename( __FILE__ ) ); // Plugin base name 'plugin.php' at root.
 
 // Include general functions.
 if ( file_exists( UCSC_GIVING_PLUGIN_DIR . 'lib/functions/general.php' ) ) {
