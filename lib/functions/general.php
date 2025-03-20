@@ -72,3 +72,30 @@ function ucscgiving_link_filter( $post_link, $post ) {
 	}
 		return $post_link;
 }
+
+/**
+ * Register Search block variation for Fund post type
+ */
+add_filter( 'get_block_type_variations', 'ucscgiving_create_fund_search_variation', 10, 2 );
+
+function ucscgiving_create_fund_search_variation( $variations, $block_type ) {
+	if ( 'core/search' !== $block_type->name ) {
+			return $variations;
+	}
+
+		$variations[] = array(
+			'name'        => 'fund-search',
+			'title'       => __( 'Fund Search', 'ucscgiving' ),
+			'description' => __( 'Search only Funds posts', 'ucscgiving' ),
+			'attributes'  => array(
+				'query'       => array(
+					'post_type' => 'fund',
+				),
+				'placeholder' => __( 'Search Funds', 'ucscgiving' ),
+				'buttonText'  => __( 'Search Funds', 'ucscgiving' ),
+				'label'       => __( 'Search Funds', 'ucscgiving' ),
+			),
+		);
+
+		return $variations;
+}
