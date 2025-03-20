@@ -38,7 +38,7 @@ if ( ! function_exists( 'ucscgiving_render_plugin_settings_page' ) ) {
 		$plugin_version     = $plugin_data['Version'];
 		$plugin_description = $plugin_data['Description'];
 		?>
-		<div class="wrap cf-admin-settings-page">
+		<div class="wrap giving-cf-admin-settings-page">
 		<h1><?php echo $plugin_name; ?></h1>
 		<h2>Version: <?php echo $plugin_version; ?> <a href="https://github.com/ucsc/ucsc-giving-functionality/releases">(release notes)</a></h2>
 		<p><?php echo $plugin_description; ?></p>
