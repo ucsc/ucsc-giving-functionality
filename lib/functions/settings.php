@@ -33,7 +33,7 @@ add_action( 'admin_menu', 'ucscgiving_add_settings_page' );
 
 if ( ! function_exists( 'ucscgiving_render_plugin_settings_page' ) ) {
 	function ucscgiving_render_plugin_settings_page() {
-		$plugin_data        = get_plugin_data( UCSC_GIVING_PLUGIN_DIR . '/plugin.php' );
+		$plugin_data        = get_plugin_data( UCSCGIVING_PLUGIN_DIR . '/plugin.php' );
 		$plugin_name        = $plugin_data['Name'];
 		$plugin_version     = $plugin_data['Version'];
 		$plugin_description = $plugin_data['Description'];
@@ -53,7 +53,7 @@ if ( ! function_exists( 'ucscgiving_render_plugin_settings_page' ) ) {
  * Add link to plugin settings page from plugin list
  */
 
-add_filter( 'plugin_action_links_' . UCSC_GIVING_PLUGIN_BASE, 'ucscgiving_settings_link' );
+add_filter( 'plugin_action_links_' . UCSCGIVING_PLUGIN_BASE, 'ucscgiving_settings_link' );
 function ucscgiving_settings_link( $links ) {
 	// Build and escape the URL.
 	$url = esc_url(
