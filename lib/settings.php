@@ -33,7 +33,7 @@ add_action( 'admin_menu', 'ucscgiving_add_settings_page' );
 
 if ( ! function_exists( 'ucscgiving_render_plugin_settings_page' ) ) {
 	function ucscgiving_render_plugin_settings_page() {
-		$plugin_data        = get_plugin_data( WP_PLUGIN_DIR . '/ucsc-giving-functionality/plugin.php' );
+		$plugin_data        = get_plugin_data( UCSC_GIVING_PLUGIN_DIR . '/plugin.php' );
 		$plugin_name        = $plugin_data['Name'];
 		$plugin_version     = $plugin_data['Version'];
 		$plugin_description = $plugin_data['Description'];
