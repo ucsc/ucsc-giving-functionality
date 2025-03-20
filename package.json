@@ -1,6 +1,6 @@
 {
   "name": "ucsc-giving-functionality-plugin",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Custom functionality plugin for UCSC Giving site",
   "main": "index.js",
   "directories": {
