@@ -31,22 +31,21 @@ if ( file_exists( UCSC_GIVING_PLUGIN_DIR . '/lib/settings.php' ) ) {
 // Enqueue admin settings styles.
 if ( ! function_exists( 'ucscgiving_enqueue_admin_styles' ) ) {
 	/**
-	* Enqueue admin settings styles
-	*
-	* No styles are enqueued for raw HTML in setting panel.
-	* In order to output HTML in the settings panel we need some basic styles.
-	*
-	* @since 0.5.0
+	 * Enqueue admin settings styles
+	 *
+	 * No styles are enqueued for raw HTML in setting panel.
+	 * In order to output HTML in the settings panel we need some basic styles.
+	 *
+	 * @since 0.5.0
 	 *
 	 * @author UCSC
 	 *
 	 * @link https://developer.wordpress.org/reference/hooks/admin_enqueue_scripts/#Example:_Load_CSS_File_from_a_plugin_on_specific_Admin_Page
 	 */
-
-	function ucscgiving_enqueue_admin_styles($hook): void {
+	function ucscgiving_enqueue_admin_styles( $hook ): void {
 		$settings_css   = plugin_dir_url( __FILE__ ) . 'lib/css/admin-settings.css';
 		$current_screen = get_current_screen();
-		// Check if it's "?page=ucsc-giving-functionality-settings." If not, just empty return. 
+		// Check if it's "?page=ucsc-giving-functionality-settings." If not, just empty return.
 		if ( strpos( $current_screen->base, 'ucsc-giving-functionality-settings' ) === false ) {
 			return;
 		}
@@ -72,4 +71,3 @@ function ucscgiving_acf_json_load_point( $paths ) {
 	$paths[] = UCSC_GIVING_PLUGIN_DIR . 'acf-json';
 	return $paths;
 }
-
