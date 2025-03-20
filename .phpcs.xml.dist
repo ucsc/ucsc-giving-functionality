@@ -75,7 +75,7 @@
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="ucsc"/>
+				<element value="ucscgiving"/>
 				<!-- <element value="library-textdomain"/> -->
 			</property>
 		</properties>
@@ -84,7 +84,7 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
-				<element value="ucsc"/>
+				<element value="ucscgiving"/>
 			</property>
 		</properties>
 	</rule>
