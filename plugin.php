@@ -16,8 +16,9 @@
  * @package ucsc-giving-functionality
  */
 
-// Set plugin directory.
+// Set plugin directory and base name.
 define( 'UCSC_GIVING_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'UCSC_GIVING_PLUGIN_BASE', plugin_basename( __FILE__ ) );
 
 // Include general functions.
 if ( file_exists( UCSC_GIVING_PLUGIN_DIR . 'lib/functions.php' ) ) {

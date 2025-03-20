@@ -49,4 +49,24 @@ if ( ! function_exists( 'ucscgiving_render_plugin_settings_page' ) ) {
 	}
 }
 
+/**
+ * Add link to plugin settings page from plugin list
+ */
 
+add_filter( 'plugin_action_links_' . UCSC_GIVING_PLUGIN_BASE, 'ucscgiving_settings_link' );
+function ucscgiving_settings_link( $links ) {
+	// Build and escape the URL.
+	$url = esc_url( add_query_arg(
+		'page',
+		'ucsc-giving-functionality-settings',
+		get_admin_url() . 'admin.php'
+	) );
+	// Create the link.
+	$settings_link = "<a href='$url'>" . __( 'Settings' ) . '</a>';
+	// Adds the link to the end of the array.
+	array_push(
+		$links,
+		$settings_link
+	);
+	return $links;
+}
