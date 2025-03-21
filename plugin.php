@@ -47,7 +47,6 @@ if ( ! function_exists( 'ucscgiving_enqueue_admin_styles' ) ) {
 		$current_screen = get_current_screen();
 		$plugin_data    = get_plugin_data( UCSCGIVING_PLUGIN_DIR . '/plugin.php' );
 		$plugin_version = $plugin_data['Version'];
-		// Check if it's "?page=ucsc-giving-functionality-settings." If not, just empty return.
 		if ( strpos( $current_screen->base, 'ucsc-giving-functionality-settings' ) === false ) {
 			return;
 		}
@@ -89,3 +88,55 @@ function ucscgiving_acf_json_load_point( $paths ) {
 }
 // Set plugin directory for loading ACF JSON files.
 add_filter( 'acf/settings/load_json', 'ucscgiving_acf_json_load_point' );
+
+
+/**
+ * Callback function to retrieve custom template content
+ *
+ * @param [type] $dir
+ * @return $dir
+ * Description
+ * @package ucsc-giving-functionality
+ */
+function ucscgiving_get_template_content( $template ) {
+	ob_start();
+	include __DIR__ . "/lib/templates/{$template}";
+	return ob_get_clean();
+}
+
+/**
+ * Register block templates
+ *
+ * @return void
+ * Description
+ * @package ucsc-giving-functionality
+ */
+function ucscgiving_register_block_templates() {
+
+	register_block_template(
+		'ucscgiving//archive-fund',
+		array(
+			'title'       => __( 'Fund archives', 'ucscgiving' ),
+			'description' => __( 'Displays the archive template for Giving Funds.', 'ucscgiving' ),
+			'content'     => ucscgiving_get_template_content( 'archive-fund.php' ),
+		)
+	);
+	register_block_template(
+		'ucscgiving//taxonomy-area',
+		array(
+			'title'       => __( 'Area archives', 'ucscgiving' ),
+			'description' => __( 'Displays the archive template for the Fund areas.', 'ucscgiving' ),
+			'content'     => ucscgiving_get_template_content( 'taxonomy-area.php' ),
+		)
+	);
+	register_block_template(
+		'ucscgiving//taxonomy-cause',
+		array(
+			'title'       => __( 'Cause archives', 'ucscgiving' ),
+			'description' => __( 'Displays the archive template for the Fund causes.', 'ucscgiving' ),
+			'content'     => ucscgiving_get_template_content( 'taxonomy-cause.php' ),
+		)
+	);
+}
+
+add_action( 'init', 'ucscgiving_register_block_templates' );
