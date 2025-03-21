@@ -17,16 +17,16 @@
  */
 
 // Set plugin directory and base name.
-define( 'UCSC_GIVING_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'UCSC_GIVING_PLUGIN_BASE', plugin_basename( __FILE__ ) );
+define( 'UCSCGIVING_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); // Path to plugin directory.
+define( 'UCSCGIVING_PLUGIN_BASE', plugin_basename( __FILE__ ) ); // Plugin base name 'plugin.php' at root.
 
 // Include general functions.
-if ( file_exists( UCSC_GIVING_PLUGIN_DIR . 'lib/functions.php' ) ) {
-	require_once UCSC_GIVING_PLUGIN_DIR . 'lib/functions.php';
+if ( file_exists( UCSCGIVING_PLUGIN_DIR . 'lib/functions/general.php' ) ) {
+	require_once UCSCGIVING_PLUGIN_DIR . 'lib/functions/general.php';
 }
 // Include settings.
-if ( file_exists( UCSC_GIVING_PLUGIN_DIR . '/lib/settings.php' ) ) {
-	include_once UCSC_GIVING_PLUGIN_DIR . '/lib/settings.php';
+if ( file_exists( UCSCGIVING_PLUGIN_DIR . '/lib/functions/settings.php' ) ) {
+	include_once UCSCGIVING_PLUGIN_DIR . '/lib/functions/settings.php';
 }
 // Enqueue admin settings styles.
 if ( ! function_exists( 'ucscgiving_enqueue_admin_styles' ) ) {
@@ -42,32 +42,50 @@ if ( ! function_exists( 'ucscgiving_enqueue_admin_styles' ) ) {
 	 *
 	 * @link https://developer.wordpress.org/reference/hooks/admin_enqueue_scripts/#Example:_Load_CSS_File_from_a_plugin_on_specific_Admin_Page
 	 */
-	function ucscgiving_enqueue_admin_styles( $hook ): void {
+	function ucscgiving_enqueue_admin_styles(): void {
 		$settings_css   = plugin_dir_url( __FILE__ ) . 'lib/css/admin-settings.css';
 		$current_screen = get_current_screen();
+		$plugin_data    = get_plugin_data( UCSCGIVING_PLUGIN_DIR . '/plugin.php' );
+		$plugin_version = $plugin_data['Version'];
 		// Check if it's "?page=ucsc-giving-functionality-settings." If not, just empty return.
 		if ( strpos( $current_screen->base, 'ucsc-giving-functionality-settings' ) === false ) {
 			return;
 		}
 
 		// Load css.
-		wp_register_style( 'ucscgiving-cf-admin-settings', $settings_css, );
+		wp_register_style( 'ucscgiving-cf-admin-settings', $settings_css, '', $plugin_version );
 		wp_enqueue_style( 'ucscgiving-cf-admin-settings' );
 	}
 }
 add_action( 'admin_enqueue_scripts', 'ucscgiving_enqueue_admin_styles' );
 
-// Set plugin directory for syncing ACF JSON files.
-add_filter( 'acf/settings/save_json', 'ucscgiving_acf_json_save_point' );
+/**
+ * ACF JSON Save Point
+ *
+ * @param [type] $path
+ * @return $path
+ * Description
+ * @package ucsc-giving-functionality
+ */
 function ucscgiving_acf_json_save_point( $path ) {
-	$path = UCSC_GIVING_PLUGIN_DIR . 'acf-json';
+	$path = UCSCGIVING_PLUGIN_DIR . 'acf-json';
 	return $path;
 }
+// Set plugin directory for saving ACF JSON files.
+add_filter( 'acf/settings/save_json', 'ucscgiving_acf_json_save_point' );
 
-// Set plugin directory for loading ACF JSON files.
-add_filter( 'acf/settings/load_json', 'ucscgiving_acf_json_load_point' );
+/**
+ * ACF JSON Load Point
+ *
+ * @param [type] $paths
+ * @return $paths
+ * Description
+ * @package ucsc-giving-functionality
+ */
 function ucscgiving_acf_json_load_point( $paths ) {
 	unset( $paths[0] );
-	$paths[] = UCSC_GIVING_PLUGIN_DIR . 'acf-json';
+	$paths[] = UCSCGIVING_PLUGIN_DIR . 'acf-json';
 	return $paths;
 }
+// Set plugin directory for loading ACF JSON files.
+add_filter( 'acf/settings/load_json', 'ucscgiving_acf_json_load_point' );
