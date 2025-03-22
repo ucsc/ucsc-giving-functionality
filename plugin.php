@@ -33,14 +33,9 @@ if ( ! function_exists( 'ucscgiving_enqueue_admin_styles' ) ) {
 	/**
 	 * Enqueue admin settings styles
 	 *
-	 * No styles are enqueued for raw HTML in setting panel.
-	 * In order to output HTML in the settings panel we need some basic styles.
-	 *
 	 * @since 0.5.0
-	 *
 	 * @author UCSC
-	 *
-	 * @link https://developer.wordpress.org/reference/hooks/admin_enqueue_scripts/#Example:_Load_CSS_File_from_a_plugin_on_specific_Admin_Page
+	 * @package ucsc-giving-functionality
 	 */
 	function ucscgiving_enqueue_admin_styles(): void {
 		$settings_css   = plugin_dir_url( __FILE__ ) . 'lib/css/admin-settings.css';
@@ -50,8 +45,6 @@ if ( ! function_exists( 'ucscgiving_enqueue_admin_styles' ) ) {
 		if ( strpos( $current_screen->base, 'ucsc-giving-functionality-settings' ) === false ) {
 			return;
 		}
-
-		// Load css.
 		wp_register_style( 'ucscgiving-cf-admin-settings', $settings_css, '', $plugin_version );
 		wp_enqueue_style( 'ucscgiving-cf-admin-settings' );
 	}
@@ -63,7 +56,6 @@ add_action( 'admin_enqueue_scripts', 'ucscgiving_enqueue_admin_styles' );
  *
  * @param [type] $path
  * @return $path
- * Description
  * @package ucsc-giving-functionality
  */
 function ucscgiving_acf_json_save_point( $path ) {
@@ -78,7 +70,6 @@ add_filter( 'acf/settings/save_json', 'ucscgiving_acf_json_save_point' );
  *
  * @param [type] $paths
  * @return $paths
- * Description
  * @package ucsc-giving-functionality
  */
 function ucscgiving_acf_json_load_point( $paths ) {
@@ -93,9 +84,9 @@ add_filter( 'acf/settings/load_json', 'ucscgiving_acf_json_load_point' );
 /**
  * Callback function to retrieve custom template content
  *
- * @param [type] $dir
- * @return $dir
- * Description
+ * @param $template
+ * @parameter $template
+ * @return $template
  * @package ucsc-giving-functionality
  */
 function ucscgiving_get_template_content( $template ) {
@@ -108,7 +99,6 @@ function ucscgiving_get_template_content( $template ) {
  * Register block templates
  *
  * @return void
- * Description
  * @package ucsc-giving-functionality
  */
 function ucscgiving_register_block_templates() {
@@ -116,7 +106,7 @@ function ucscgiving_register_block_templates() {
 	register_block_template(
 		'ucscgiving//archive-fund',
 		array(
-			'title'       => __( 'Fund archives', 'ucscgiving' ),
+			'title'       => __( 'Fund Archives', 'ucscgiving' ),
 			'description' => __( 'Displays the archive template for Giving Funds.', 'ucscgiving' ),
 			'content'     => ucscgiving_get_template_content( 'archive-fund.php' ),
 		)
@@ -124,7 +114,7 @@ function ucscgiving_register_block_templates() {
 	register_block_template(
 		'ucscgiving//taxonomy-area',
 		array(
-			'title'       => __( 'Area archives', 'ucscgiving' ),
+			'title'       => __( 'Area Archives', 'ucscgiving' ),
 			'description' => __( 'Displays the archive template for the Fund areas.', 'ucscgiving' ),
 			'content'     => ucscgiving_get_template_content( 'taxonomy-area.php' ),
 		)
@@ -132,9 +122,17 @@ function ucscgiving_register_block_templates() {
 	register_block_template(
 		'ucscgiving//taxonomy-cause',
 		array(
-			'title'       => __( 'Cause archives', 'ucscgiving' ),
+			'title'       => __( 'Cause Archives', 'ucscgiving' ),
 			'description' => __( 'Displays the archive template for the Fund causes.', 'ucscgiving' ),
 			'content'     => ucscgiving_get_template_content( 'taxonomy-cause.php' ),
+		)
+	);
+	register_block_template(
+		'ucscgiving//single-fund',
+		array(
+			'title'       => __( 'Single Funds Posts', 'ucscgiving' ),
+			'description' => __( 'Displays the single post template for Funds.', 'ucscgiving' ),
+			'content'     => ucscgiving_get_template_content( 'single-fund.php' ),
 		)
 	);
 }
