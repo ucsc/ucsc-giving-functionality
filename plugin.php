@@ -96,45 +96,49 @@ function ucscgiving_get_template_content( $template ) {
 }
 
 /**
- * Register block templates
+ * Register Fund block templates
  *
  * @return void
  * @package ucsc-giving-functionality
  */
 function ucscgiving_register_block_templates() {
-
-	register_block_template(
-		'ucscgiving//archive-fund',
-		array(
+	$templates = array(
+		'archive-fund'       => array(
 			'title'       => __( 'Fund Archives', 'ucscgiving' ),
 			'description' => __( 'Displays the archive template for Giving Funds.', 'ucscgiving' ),
-			'content'     => ucscgiving_get_template_content( 'archive-fund.php' ),
-		)
-	);
-	register_block_template(
-		'ucscgiving//taxonomy-area',
-		array(
+		),
+		'taxonomy-area'      => array(
 			'title'       => __( 'Area Archives', 'ucscgiving' ),
 			'description' => __( 'Displays the archive template for the Fund areas.', 'ucscgiving' ),
-			'content'     => ucscgiving_get_template_content( 'taxonomy-area.php' ),
-		)
-	);
-	register_block_template(
-		'ucscgiving//taxonomy-cause',
-		array(
+		),
+		'taxonomy-cause'     => array(
 			'title'       => __( 'Cause Archives', 'ucscgiving' ),
 			'description' => __( 'Displays the archive template for the Fund causes.', 'ucscgiving' ),
-			'content'     => ucscgiving_get_template_content( 'taxonomy-cause.php' ),
-		)
-	);
-	register_block_template(
-		'ucscgiving//single-fund',
-		array(
+		),
+		'taxonomy-fund-type' => array(
+			'title'       => __( 'Fund Type Archives', 'ucscgiving' ),
+			'description' => __( 'Displays the archive template for the Fund types.', 'ucscgiving' ),
+		),
+		'taxonomy-keyword'   => array(
+			'title'       => __( 'Fund Keyword Archives', 'ucscgiving' ),
+			'description' => __( 'Displays the archive template for the Fund keywords.', 'ucscgiving' ),
+		),
+		'single-fund'        => array(
 			'title'       => __( 'Single Funds Posts', 'ucscgiving' ),
 			'description' => __( 'Displays the single post template for Funds.', 'ucscgiving' ),
-			'content'     => ucscgiving_get_template_content( 'single-fund.php' ),
-		)
+		),
 	);
+
+	foreach ( $templates as $slug => $data ) {
+		register_block_template(
+			'ucscgiving//' . $slug,
+			array(
+				'title'       => $data['title'],
+				'description' => $data['description'],
+				'content'     => ucscgiving_get_template_content( $slug . '.php' ),
+			)
+		);
+	}
 }
 
 add_action( 'init', 'ucscgiving_register_block_templates' );
