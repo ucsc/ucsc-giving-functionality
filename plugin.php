@@ -108,11 +108,11 @@ function ucscgiving_register_block_templates() {
 			'description' => __( 'Displays the archive template for Giving Funds.', 'ucscgiving' ),
 		),
 		'taxonomy-area'      => array(
-			'title'       => __( 'Area Archives', 'ucscgiving' ),
+			'title'       => __( 'Fund Area Archives', 'ucscgiving' ),
 			'description' => __( 'Displays the archive template for the Fund areas.', 'ucscgiving' ),
 		),
 		'taxonomy-cause'     => array(
-			'title'       => __( 'Cause Archives', 'ucscgiving' ),
+			'title'       => __( 'Fund Cause Archives', 'ucscgiving' ),
 			'description' => __( 'Displays the archive template for the Fund causes.', 'ucscgiving' ),
 		),
 		'taxonomy-fund-type' => array(
