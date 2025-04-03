@@ -3,9 +3,5 @@
 <!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->
 <div class="wp-block-group"><!-- wp:categories {"taxonomy":"area","displayAsDropdown":true} /-->
 
-<!-- wp:categories {"taxonomy":"cause","displayAsDropdown":true} /-->
-
-<!-- wp:categories {"taxonomy":"keyword","displayAsDropdown":true} /-->
-
-<!-- wp:categories {"taxonomy":"fund-type","displayAsDropdown":true} /--></div>
+<!-- wp:categories {"taxonomy":"cause","displayAsDropdown":true} /--></div>
 <!-- /wp:group -->
