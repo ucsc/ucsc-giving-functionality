@@ -65,14 +65,11 @@
     "query_var": "post_type_key",
     "query_var_name": "",
     "default_term": {
-        "default_term_enabled": "1",
-        "default_term_name": "Standard",
-        "default_term_slug": "standard",
-        "default_term_description": "Standard fund links directly to Giving form"
+        "default_term_enabled": "0"
     },
     "sort": 0,
     "meta_box": "default",
     "meta_box_cb": "",
     "meta_box_sanitize_cb": "",
-    "modified": 1742485386
+    "modified": 1751046847
 }
