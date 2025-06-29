@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.4](https://github.com/ucsc/ucsc-giving-functionality-plugin/compare/v0.5.3...v0.5.4) (2025-06-29)
+
 ### [0.5.3](https://github.com/ucsc/ucsc-giving-functionality-plugin/compare/v0.5.2...v0.5.3) (2025-06-28)
 
 ### [0.5.2](https://github.com/ucsc/ucsc-giving-functionality-plugin/compare/v0.5.1...v0.5.2) (2025-03-21)
