@@ -3,6 +3,13 @@
 ## Overview
 WordPress plugin that creates a custom post type "Fund" for the UCSC Giving website, with external linking to donation forms. Funds can be "Priority" (single post pages) or "Standard" (direct external links).
 
+## Repository Information
+- **Repository**: ucsc/ucsc-giving-functionality
+- **Default Branch**: main
+- **Package URLs**: References `ucsc-giving-functionality-plugin` in package.json
+- **Issues**: https://github.com/ucsc/ucsc-giving-functionality-plugin/issues
+- **Homepage**: https://github.com/ucsc/ucsc-giving-functionality-plugin
+
 ## Architecture & Key Components
 
 ### Core Plugin Structure
