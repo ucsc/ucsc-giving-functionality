@@ -57,27 +57,24 @@ function ucscgiving_fund_url() {
  * @return string
  */
 function ucscgiving_link_filter( $post_link, $post ) {
+	if ( 'fund' !== $post->post_type ) {
+		return $post_link;
+	}
+
+	$terms = wp_get_post_terms( $post->ID, 'fund-type', array( 'fields' => 'names' ) );
+
+	if ( ! is_wp_error( $terms ) && in_array( 'Standard', $terms, true ) ) {
 		$baseurl     = get_field( 'base_url', 'option' );
-		$designation = get_post_meta( get_the_ID(), 'designation', true );
-		$fund_id     = get_field( 'fund-type-term' );
-		$fund        = get_term( $fund_id );
-		$fundurl     = '';
-	if ( ( 'fund' === $post->post_type ) ) {
-		if ( ! is_wp_error( $fund ) ) {
-			$fundname = $fund->name;
-			if ( $fundname === 'Standard' ) {
-				if ( ! empty( $baseurl ) && ! empty( $designation ) ) {
-					$fundurl = esc_attr( $baseurl . $designation );
-				} elseif ( ! empty( $baseurl ) ) {
-					$fundurl = esc_attr( $baseurl );
-				} else {
-					$fundurl = '';
-				}
-				return $fundurl;
-			}
+		$designation = get_post_meta( $post->ID, 'designation', true );
+
+		if ( ! empty( $baseurl ) && ! empty( $designation ) ) {
+			return esc_attr( $baseurl . $designation );
+		} elseif ( ! empty( $baseurl ) ) {
+			return esc_attr( $baseurl );
 		}
 	}
-		return $post_link;
+
+	return $post_link;
 }
 
 add_filter( 'post_type_link', 'ucscgiving_link_filter', 10, 2 );
