@@ -7,8 +7,8 @@
     "lib": "lib"
   },
   "scripts": {
-    "release": "standard-version",
-    "dryrun": "standard-version --dry-run",
+    "release": "commit-and-tag-version",
+    "dryrun": "commit-and-tag-version --dry-run",
     "zip": "wp-scripts plugin-zip",
     "packages-update": "wp-scripts packages-update"
   },
@@ -28,7 +28,7 @@
   "homepage": "https://github.com/ucsc/ucsc-giving-functionality-plugin#readme",
   "devDependencies": {
     "@wordpress/scripts": "^30.12.0",
-    "standard-version": "^9.5.0"
+    "commit-and-tag-version": "^12.7.1"
   },
   "files": [
     "acf-json",
@@ -38,7 +38,7 @@
     "CHANGELOG.md",
     "LICENSE"
   ],
-  "standard-version": {
+  "commit-and-tag-version": {
     "bumpFiles": [
       {
         "filename": "package-lock.json",
