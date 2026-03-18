@@ -80,6 +80,34 @@ function ucscgiving_link_filter( $post_link, $post ) {
 add_filter( 'post_type_link', 'ucscgiving_link_filter', 10, 2 );
 
 /**
+ * Sync fund-type taxonomy after Block Editor (REST API) save
+ *
+ * WordPress REST API save order in WP_REST_Posts_Controller::update_item():
+ *   1. wp_update_post() — saves post data, fires save_post.
+ *   2. update_additional_fields_for_object() — saves ACF REST meta fields,
+ *      including fund-type-term with the user's new selection.
+ *   3. handle_terms() — processes taxonomy terms from the REST request, but
+ *      the Block Editor's taxonomy entity state was loaded with the old value
+ *      and is not updated when the ACF sidebar field changes, so this may
+ *      overwrite the fund-type taxonomy back to its pre-save value.
+ *   4. rest_after_insert_{post_type} — fires after all of the above.
+ *
+ * This hook runs at priority 999 in step 4 to re-sync the fund-type taxonomy
+ * from the fund-type-term meta (correctly saved in step 2), overriding any
+ * stale value written by handle_terms() in step 3.
+ *
+ * @param WP_Post $post Inserted or updated post object.
+ * @return void
+ */
+function ucscgiving_sync_fund_type_term( $post ) {
+	$term_id = absint( get_post_meta( $post->ID, 'fund-type-term', true ) );
+	$terms   = $term_id > 0 ? array( $term_id ) : array();
+	wp_set_post_terms( $post->ID, $terms, 'fund-type' );
+}
+
+add_action( 'rest_after_insert_fund', 'ucscgiving_sync_fund_type_term', 999, 1 );
+
+/**
  * Register Search block variation for Fund post type
  * description: Registers a custom block variation for the Fund post type
  *
