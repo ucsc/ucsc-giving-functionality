@@ -44,6 +44,16 @@ if ( ! function_exists( 'ucscgiving_render_plugin_settings_page' ) ) {
 		<p><?php echo wp_kses_post( $plugin_description ); ?></p>
 		<hr>
 		<h3>Features added by this plugin:</h3>
+		<ul>
+			<li><strong>Fund custom post type</strong> &mdash; Registers a <code>fund</code> post type for managing giving fund listings.</li>
+			<li><strong>Fund taxonomies</strong> &mdash; Registers four custom taxonomies: <em>Areas</em>, <em>Keywords</em>, <em>Fund Type</em>, and <em>Themes</em>.</li>
+			<li><strong>ACF field groups</strong> &mdash; Bundles ACF JSON definitions for <em>Fund Details</em> and <em>Giving Options</em> (options page) fields.</li>
+			<li><strong>External giving URL filter</strong> &mdash; Rewrites fund permalink to the external giving URL (base URL + designation code) for funds with a <em>Standard</em> fund type.</li>
+			<li><strong>Fund URL block binding</strong> &mdash; Registers a <code>ucscgiving/fund-url</code> block bindings source that exposes the computed giving URL to the block editor.</li>
+			<li><strong>Fund Search block variation</strong> &mdash; Adds a <em>Fund Search</em> variation of the core Search block scoped to the <code>fund</code> post type.</li>
+			<li><strong>Fund search template redirect</strong> &mdash; Routes fund post-type search queries through the fund archive template.</li>
+			<li><strong>Block templates</strong> &mdash; Registers six block templates: <em>Fund Archives</em>, <em>Single Fund</em>, <em>Fund Area Archives</em>, <em>Fund Theme Archives</em>, <em>Fund Type Archives</em>, and <em>Fund Keyword Archives</em>.</li>
+		</ul>
 		</div>
 		<?php
 	}
