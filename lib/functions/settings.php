@@ -39,9 +39,9 @@ if ( ! function_exists( 'ucscgiving_render_plugin_settings_page' ) ) {
 		$plugin_description = $plugin_data['Description'];
 		?>
 		<div class="wrap giving-cf-admin-settings-page">
-		<h1><?php echo $plugin_name; ?></h1>
-		<h2>Version: <?php echo $plugin_version; ?> <a href="https://github.com/ucsc/ucsc-giving-functionality/releases">(release notes)</a></h2>
-		<p><?php echo $plugin_description; ?></p>
+		<h1><?php echo esc_html( $plugin_name ); ?></h1>
+		<h2>Version: <?php echo esc_html( $plugin_version ); ?> <a href="<?php echo esc_url( 'https://github.com/ucsc/ucsc-giving-functionality/releases' ); ?>">(release notes)</a></h2>
+		<p><?php echo wp_kses_post( $plugin_description ); ?></p>
 		<hr>
 		<h3>Features added by this plugin:</h3>
 		</div>
