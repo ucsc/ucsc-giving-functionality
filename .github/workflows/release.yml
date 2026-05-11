@@ -24,7 +24,7 @@ jobs:
             zip-name: ${{ github.event.repository.name }}-plugin.zip
             # Uncomment / adjust any of these to override defaults:
             # node-version: '24'
-            # build-command: 'build'
+            build-command: 'zip'
             # use-composer: true
             # composer-args: '--no-dev --no-progress --optimize-autoloader'
             # generate-release-notes: true
