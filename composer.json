@@ -1,4 +1,6 @@
 {
+    "name": "ucsc/giving-functionality",
+    "description": "Adds custom functionality to UCSC Giving Website.",
     "require-dev": {
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
         "wp-coding-standards/wpcs": "^3.1"
