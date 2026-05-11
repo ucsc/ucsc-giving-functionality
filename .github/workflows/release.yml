@@ -20,7 +20,7 @@ jobs:
         # Point this at your shared repo. Pin to a tag for stability.
         uses: ucsc/actions/.github/workflows/release.yml@v1
         with:
-            zip-name: ${{ github.event.repository.name }}.zip
+            zip-name: ${{ github.event.repository.name }}-plugin.zip
             # Uncomment / adjust any of these to override defaults:
             # node-version: '24'
             # build-command: 'build'
