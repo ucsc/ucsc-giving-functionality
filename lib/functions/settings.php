@@ -11,11 +11,14 @@
  * @license      http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
-/**
- * Register new menu and page in WordPress Settings
- */
+defined( 'ABSPATH' ) || exit;
 
 if ( ! function_exists( 'ucscgiving_add_settings_page' ) ) {
+	/**
+	 * Register new menu and page in WordPress Settings
+	 *
+	 * @return void
+	 */
 	function ucscgiving_add_settings_page() {
 		add_options_page( 'UCSC Giving Functionality plugin page', 'UCSC Giving Functionality', 'manage_options', 'ucsc-giving-functionality-settings', 'ucscgiving_render_plugin_settings_page' );
 	}
@@ -32,6 +35,11 @@ add_action( 'admin_menu', 'ucscgiving_add_settings_page' );
  */
 
 if ( ! function_exists( 'ucscgiving_render_plugin_settings_page' ) ) {
+	/**
+	 * Render the plugin settings/info page.
+	 *
+	 * @return void
+	 */
 	function ucscgiving_render_plugin_settings_page() {
 		$plugin_data        = get_plugin_data( UCSCGIVING_PLUGIN_DIR . '/plugin.php' );
 		$plugin_name        = $plugin_data['Name'];
@@ -59,26 +67,27 @@ if ( ! function_exists( 'ucscgiving_render_plugin_settings_page' ) ) {
 	}
 }
 
+add_filter( 'plugin_action_links_' . UCSCGIVING_PLUGIN_BASE, 'ucscgiving_settings_link' );
+
 /**
  * Add link to plugin settings page from plugin list
+ *
+ * @param array $links Existing plugin action links.
+ * @return array Action links with the settings link appended.
  */
-
-add_filter( 'plugin_action_links_' . UCSCGIVING_PLUGIN_BASE, 'ucscgiving_settings_link' );
 function ucscgiving_settings_link( $links ) {
-	// Build and escape the URL.
-	$url = esc_url(
-		add_query_arg(
-			'page',
-			'ucsc-giving-functionality-settings',
-			get_admin_url() . 'admin.php'
-		)
-	);
-	// Create the link.
-	$settings_link = "<a href='$url'>" . __( 'Settings' ) . '</a>';
-	// Adds the link to the end of the array.
-	array_push(
-		$links,
-		$settings_link
-	);
+	// menu_page_url() resolves the registered parent (options-general.php),
+	// so this stays correct if the page is ever re-parented. It returns an
+	// empty string when the page was never registered — which happens when
+	// add_options_page() bailed on a capability check — so fall back to the
+	// known parent rather than dropping the link entirely.
+	$url = menu_page_url( 'ucsc-giving-functionality-settings', false );
+
+	if ( empty( $url ) ) {
+		$url = admin_url( 'options-general.php?page=ucsc-giving-functionality-settings' );
+	}
+
+	$links[] = '<a href="' . esc_url( $url ) . '">' . esc_html__( 'Settings', 'ucscgiving' ) . '</a>';
+
 	return $links;
 }
