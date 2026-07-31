@@ -49,3 +49,6 @@ wp-config.php
 node_modules
 
 /vendor/
+
+# Editor directories
+.vscode/
