@@ -16,6 +16,8 @@
  * @package ucsc-giving-functionality
  */
 
+defined( 'ABSPATH' ) || exit;
+
 // Set plugin directory and base name.
 define( 'UCSCGIVING_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); // Path to plugin directory.
 define( 'UCSCGIVING_PLUGIN_BASE', plugin_basename( __FILE__ ) ); // Plugin base name 'plugin.php' at root.
@@ -38,14 +40,22 @@ if ( ! function_exists( 'ucscgiving_enqueue_admin_styles' ) ) {
 	 * @package ucsc-giving-functionality
 	 */
 	function ucscgiving_enqueue_admin_styles(): void {
-		$settings_css   = plugin_dir_url( __FILE__ ) . 'lib/css/admin-settings.css';
 		$current_screen = get_current_screen();
-		$plugin_data    = get_plugin_data( UCSCGIVING_PLUGIN_DIR . '/plugin.php' );
-		$plugin_version = $plugin_data['Version'];
-		if ( strpos( $current_screen->base, 'ucsc-giving-functionality-settings' ) === false ) {
+
+		// get_current_screen() returns null outside a real admin screen (ajax, customizer).
+		if ( ! $current_screen instanceof WP_Screen ) {
 			return;
 		}
-		wp_register_style( 'ucscgiving-cf-admin-settings', $settings_css, '', $plugin_version );
+
+		if ( false === strpos( $current_screen->base, 'ucsc-giving-functionality-settings' ) ) {
+			return;
+		}
+
+		$settings_css   = plugin_dir_url( __FILE__ ) . 'lib/css/admin-settings.css';
+		$plugin_data    = get_plugin_data( UCSCGIVING_PLUGIN_DIR . 'plugin.php' );
+		$plugin_version = $plugin_data['Version'];
+
+		wp_register_style( 'ucscgiving-cf-admin-settings', $settings_css, array(), $plugin_version );
 		wp_enqueue_style( 'ucscgiving-cf-admin-settings' );
 	}
 }
@@ -54,8 +64,8 @@ add_action( 'admin_enqueue_scripts', 'ucscgiving_enqueue_admin_styles' );
 /**
  * ACF JSON Save Point
  *
- * @param [type] $path
- * @return $path
+ * @param string $path Default ACF JSON save path.
+ * @return string Path to this plugin's acf-json directory.
  * @package ucsc-giving-functionality
  */
 function ucscgiving_acf_json_save_point( $path ) {
@@ -68,8 +78,8 @@ add_filter( 'acf/settings/save_json', 'ucscgiving_acf_json_save_point' );
 /**
  * ACF JSON Load Point
  *
- * @param [type] $paths
- * @return $paths
+ * @param array $paths Default ACF JSON load paths.
+ * @return array Load paths with this plugin's acf-json directory substituted in.
  * @package ucsc-giving-functionality
  */
 function ucscgiving_acf_json_load_point( $paths ) {
@@ -84,9 +94,8 @@ add_filter( 'acf/settings/load_json', 'ucscgiving_acf_json_load_point' );
 /**
  * Callback function to retrieve custom template content
  *
- * @param $template
- * @parameter $template
- * @return $template
+ * @param string $template Template filename, relative to lib/templates/.
+ * @return string Rendered template markup.
  * @package ucsc-giving-functionality
  */
 function ucscgiving_get_template_content( $template ) {
@@ -103,27 +112,27 @@ function ucscgiving_get_template_content( $template ) {
  */
 function ucscgiving_register_block_templates() {
 	$templates = array(
-		'archive-fund'       => array(
+		'archive-fund'        => array(
 			'title'       => __( 'Fund Archives', 'ucscgiving' ),
 			'description' => __( 'Displays the archive template for Giving Funds.', 'ucscgiving' ),
 		),
-		'taxonomy-area'      => array(
+		'taxonomy-area'       => array(
 			'title'       => __( 'Fund Area Archives', 'ucscgiving' ),
 			'description' => __( 'Displays the archive template for the Fund areas.', 'ucscgiving' ),
 		),
-		'taxonomy-fund-theme'     => array(
+		'taxonomy-fund-theme' => array(
 			'title'       => __( 'Fund Theme Archives', 'ucscgiving' ),
 			'description' => __( 'Displays the archive template for the Fund themes.', 'ucscgiving' ),
 		),
-		'taxonomy-fund-type' => array(
+		'taxonomy-fund-type'  => array(
 			'title'       => __( 'Fund Type Archives', 'ucscgiving' ),
 			'description' => __( 'Displays the archive template for the Fund types.', 'ucscgiving' ),
 		),
-		'taxonomy-keyword'   => array(
+		'taxonomy-keyword'    => array(
 			'title'       => __( 'Fund Keyword Archives', 'ucscgiving' ),
 			'description' => __( 'Displays the archive template for the Fund keywords.', 'ucscgiving' ),
 		),
-		'single-fund'        => array(
+		'single-fund'         => array(
 			'title'       => __( 'Single Funds Posts', 'ucscgiving' ),
 			'description' => __( 'Displays the single post template for Funds.', 'ucscgiving' ),
 		),

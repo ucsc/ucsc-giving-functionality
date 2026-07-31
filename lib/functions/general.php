@@ -8,6 +8,8 @@
  * @package ucsc-giving-functionality
  */
 
+defined( 'ABSPATH' ) || exit;
+
 add_action( 'init', 'ucscgiving_register_fund_url_block_binding' );
 
 /**
@@ -54,30 +56,41 @@ function ucscgiving_fund_url() {
 /**
  * Set permalinks to the external Giving URL
  *
- * @return string
+ * Funds with a "Standard" fund type link out to the external giving site
+ * rather than to their own single post. Everything else is left untouched.
+ *
+ * @param string  $post_link The post's permalink.
+ * @param WP_Post $post      The post being linked to.
+ * @return string The external giving URL, or the unmodified permalink.
  */
 function ucscgiving_link_filter( $post_link, $post ) {
-		$baseurl     = get_field( 'base_url', 'option' );
-		$designation = get_post_meta( get_the_ID(), 'designation', true );
-		$fund_id     = get_field( 'fund-type-term' );
-		$fund        = get_term( $fund_id );
-		$fundurl     = '';
-	if ( ( 'fund' === $post->post_type ) ) {
-		if ( ! is_wp_error( $fund ) ) {
-			$fundname = $fund->name;
-			if ( $fundname === 'Standard' ) {
-				if ( ! empty( $baseurl ) && ! empty( $designation ) ) {
-					$fundurl = esc_attr( $baseurl . $designation );
-				} elseif ( ! empty( $baseurl ) ) {
-					$fundurl = esc_attr( $baseurl );
-				} else {
-					$fundurl = '';
-				}
-				return $fundurl;
-			}
-		}
-	}
+	if ( 'fund' !== $post->post_type ) {
 		return $post_link;
+	}
+
+	// Read against $post->ID rather than loop state, so this is correct in
+	// admin list tables, REST responses and feeds as well as the main loop.
+	$fund_id = get_field( 'fund-type-term', $post->ID );
+
+	if ( empty( $fund_id ) ) {
+		return $post_link;
+	}
+
+	$fund = get_term( $fund_id );
+
+	if ( is_wp_error( $fund ) || ! $fund instanceof WP_Term || 'Standard' !== $fund->name ) {
+		return $post_link;
+	}
+
+	$baseurl = get_field( 'base_url', 'option' );
+
+	if ( empty( $baseurl ) ) {
+		return $post_link;
+	}
+
+	$designation = get_post_meta( $post->ID, 'designation', true );
+
+	return esc_url( $baseurl . $designation );
 }
 
 add_filter( 'post_type_link', 'ucscgiving_link_filter', 10, 2 );
@@ -86,7 +99,7 @@ add_filter( 'post_type_link', 'ucscgiving_link_filter', 10, 2 );
  * Register Search block variation for Fund post type
  * description: Registers a custom block variation for the Fund post type
  *
- * @param mixed         $variations
+ * @param array         $variations Registered variations for the block type.
  * @param WP_Block_Type $block_type The block type being filtered.
  * @return mixed
  */
@@ -118,8 +131,8 @@ add_filter( 'get_block_type_variations', 'ucscgiving_create_fund_search_variatio
  * Return Fund search results in Fund archive template
  * description: Returns the Fund search results in its archive template.
  *
- * @param string $template
- * @return string
+ * @param string $template Path to the search template WordPress resolved.
+ * @return string Empty string to fall through to the archive template, or the original path.
  */
 function ucscgiving_fund_search_template( $template ) {
 	if ( is_search() && 'fund' === get_query_var( 'post_type' ) ) {
@@ -129,4 +142,4 @@ function ucscgiving_fund_search_template( $template ) {
 	return $template;
 }
 
-add_action( 'search_template', 'ucscgiving_fund_search_template' );
+add_filter( 'search_template', 'ucscgiving_fund_search_template' );
