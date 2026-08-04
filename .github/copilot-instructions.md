@@ -125,9 +125,11 @@ Fund search results are returned using the archive template via `ucscgiving_fund
 - UCSC-2022 theme (template parts referenced in block templates)
 
 ## Testing
-There is no automated test suite. Validate changes manually:
+`composer test` runs a PHPUnit suite; `composer lint` runs PHPCS. Both run on every pull request via `.github/workflows/ci.yml` on PHP 8.1 and 8.4.
+
+The suite stubs WordPress (`tests/bootstrap.php`) rather than running inside it, so it covers only functions that are pure once WordPress is stubbed. Everything else still needs manual validation:
 - Test both Priority and Standard fund types for correct linking behavior
 - Verify block bindings render correct URLs in the block editor and on the front end
 - Check the "Fund Search" block variation appears in the block inserter
 - Validate ACF fields save correctly and that values appear in templates
-- Run `composer lint` before committing to ensure WordPress Coding Standards compliance
+- Run `composer lint` and `composer test` before committing; CI runs both and will fail the PR otherwise
