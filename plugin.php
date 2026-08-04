@@ -17,7 +17,7 @@
  * @package ucsc-giving-functionality
  */
 
-defined( 'ABSPATH' ) || exit;
+defined('ABSPATH') || exit;
 
 // Set plugin directory and base name.
 define( 'UCSCGIVING_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); // Path to plugin directory.
