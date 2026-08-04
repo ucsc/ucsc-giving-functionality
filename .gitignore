@@ -52,3 +52,7 @@ node_modules
 
 # Editor directories
 .vscode/
+
+# PHPUnit
+.phpunit.cache/
+.phpunit.result.cache

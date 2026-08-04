@@ -1,9 +1,11 @@
 # Continuous integration — runs on every pull request.
 #
 # release.yml only fires on v*.*.* tags, so before this workflow nothing
-# validated a pull request. PHPCS is currently the repo's only mechanical
-# gate; a test suite is tracked separately in issue #128 and should be added
-# as another step in this same job.
+# validated a pull request. Runs PHPCS for style and PHPUnit for behaviour.
+#
+# The PHPUnit suite is unit-level: tests/bootstrap.php stubs WordPress, so no
+# WordPress install, database, ACF Pro licence or ucsc-2022 theme is needed
+# here. See issue #129 for why full integration testing is out of scope.
 
 name: CI
 
@@ -22,8 +24,8 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    lint:
-        name: PHPCS (PHP ${{ matrix.php-version }})
+    checks:
+        name: PHP ${{ matrix.php-version }}
         runs-on: ubuntu-latest
 
         strategy:
@@ -42,6 +44,7 @@ jobs:
               uses: shivammathur/setup-php@2.37.2
               with:
                   php-version: ${{ matrix.php-version }}
+                  extensions: mbstring
                   coverage: none
                   tools: composer
 
@@ -50,3 +53,6 @@ jobs:
 
             - name: Run PHPCS
               run: composer lint
+
+            - name: Run PHPUnit
+              run: composer test
