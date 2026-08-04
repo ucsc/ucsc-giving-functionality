@@ -10,12 +10,12 @@ This is a technical roadmap, not a product plan. Items are grounded in open issu
 
 | Item | Tracking | State |
 |---|---|---|
-| Double-save on Fund type change | [#3](https://github.com/ucsc/ucsc-giving-functionality/issues/3) | PR [#21](https://github.com/ucsc/ucsc-giving-functionality/pull/21) draft, **conflicting** |
-| `CLAUDE.md` / `ROADMAP.md` project context | [#122](https://github.com/ucsc/ucsc-giving-functionality/issues/122) | This change |
+| Dual source of truth for fund type | [#3](https://github.com/ucsc/ucsc-giving-functionality/issues/3) | Open, **needs a decision** — see [§1](#1-resolve-the-dual-source-of-truth-for-fund-type) |
+| `CLAUDE.md` / `ROADMAP.md` project context | [#122](https://github.com/ucsc/ucsc-giving-functionality/issues/122) | Landed in [#125](https://github.com/ucsc/ucsc-giving-functionality/pull/125) |
 
 ### Needs a decision
 
-**PR #21 needs a rebase, or replacing.** It is a draft last touched 2026-03-18 and now conflicts with `main`: it edits `lib/functions/general.php`, and [#121](https://github.com/ucsc/ucsc-giving-functionality/pull/121) rewrote `ucscgiving_link_filter()` in that same file. Decide whether to rebase it or supersede it — see the next section, because the underlying problem is likely better solved at the data-model level than in the editor.
+**#3 needs an owner to pick a data model.** The issue has been rewritten around the root cause rather than the double-save symptom; §1 below is the decision it is waiting on. PR [#21](https://github.com/ucsc/ucsc-giving-functionality/pull/21) — a Copilot draft that added a third writer on `rest_after_insert_fund` to correct the other two — was **closed unmerged** on 2026-08-04. It had gone stale and conflicted with [#121](https://github.com/ucsc/ucsc-giving-functionality/pull/121), which rewrote `ucscgiving_link_filter()` in the same file, and it treated the symptom rather than the dual ownership.
 
 ### Recently landed
 
@@ -28,17 +28,19 @@ This is a technical roadmap, not a product plan. Items are grounded in open issu
 
 **The highest-value architectural item.** Issue #3 describes the symptom — a Fund must be saved twice for a type change to stick — but the cause is structural: *fund type is stored in two places at once.*
 
-- The `fund-type` taxonomy holds the term.
-- The ACF field `fund-type-term` (`field_67cc7f695ce26`) is a taxonomy field with `save_terms = 1` and `load_terms = 1`, so ACF **also** reads and writes that same term.
+- The `fund-type` taxonomy holds the term. It is registered with `show_in_rest = 1` but `show_ui = 0`, so the Block Editor loads the post's term IDs into its entity state and writes them back through `handle_terms()` on every save — while giving the editor no panel that would ever update that state. It round-trips a stale value.
+- The ACF field `fund-type-term` (`field_67cc7f695ce26`) is a taxonomy field with `save_terms = 1` and `load_terms = 1`, so ACF **also** reads and writes that same term. This is the control the editor actually sees.
 
-Two systems own the same value and write it on different passes of the save cycle, which is what produces the double-save. Downstream code inherits the ambiguity: `ucscgiving_link_filter()` reads the ACF field and resolves it with `get_term()`, so the linking behavior depends on which writer won.
+Two systems own the same value and write it on different passes of the save cycle, which is what produces the double-save.
+
+The read path is entangled too. `load_terms = 1` means `get_field( 'fund-type-term' )` in `ucscgiving_link_filter()` resolves through the **taxonomy**, not through the `fund-type-term` meta row — so the two stores can diverge silently, and fund linking follows whichever writer won the last save.
 
 Worth deciding explicitly:
 
-- **Taxonomy as the single source of truth** — drop `save_terms`/`load_terms`, or drop the ACF field entirely and edit the term through the standard taxonomy UI. Simplest model; requires a migration path for existing posts and a rewrite of the `get_field()` reads.
-- **ACF field as the single source of truth** — keep the field, make the taxonomy purely derived. Keeps the curated editor UX.
+- **Taxonomy as the single source of truth** — drop `save_terms`/`load_terms`, or drop the ACF field entirely and set `show_ui = 1` to edit the term through the standard taxonomy panel. Simplest model, and it matches what the read path already effectively does; requires a migration path for existing posts and a rewrite of the `get_field()` reads.
+- **ACF field as the single source of truth** — keep the field and set `show_in_rest = 0` on the taxonomy so the editor stops round-tripping stale term state, leaving ACF's `save_terms` as the only writer. Keeps the curated editor UX, but leaves two stores in place.
 
-Either way this should be settled before more logic is layered on top of fund type, and it likely subsumes PR #21.
+The first is the better default unless the sidebar radio UX is non-negotiable. Either way this should be settled before more logic is layered on top of fund type.
 
 ## 2. Reduce coupling to the `ucsc-2022` theme
 
