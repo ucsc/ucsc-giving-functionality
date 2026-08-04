@@ -18,6 +18,8 @@ npm run release       # Tag a release and update CHANGELOG.md
 
 There is **no automated test suite** — no PHPUnit, no wp-env config, no JS tests. `composer lint` is the only mechanical gate. Validate behavior by hand against a WordPress install with ACF Pro and the `ucsc-2022` theme active.
 
+`composer lint` runs on every pull request via `.github/workflows/ci.yml` (PHP 8.1 and 8.4), so a style regression fails the PR. `release.yml` still only fires on tags.
+
 ## Repository shape
 
 This is a **standalone plugin repo**, not a site tree. There is no `wp-content/`, so tooling that scans for `wp-content/plugins/*` reports zero plugins here. The bootstrap is `plugin.php` at the repo root — not a file named after the plugin.

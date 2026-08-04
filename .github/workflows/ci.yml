@@ -1,0 +1,52 @@
+# Continuous integration — runs on every pull request.
+#
+# release.yml only fires on v*.*.* tags, so before this workflow nothing
+# validated a pull request. PHPCS is currently the repo's only mechanical
+# gate; a test suite is tracked separately in issue #128 and should be added
+# as another step in this same job.
+
+name: CI
+
+on:
+    pull_request:
+    push:
+        branches:
+            - main
+
+permissions:
+    contents: read
+
+# A new push to the same ref makes the in-flight run redundant.
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    lint:
+        name: PHPCS (PHP ${{ matrix.php-version }})
+        runs-on: ubuntu-latest
+
+        strategy:
+            # Report every failing version, not just the first.
+            fail-fast: false
+            matrix:
+                # 8.1 is the declared floor and what ucsc/wp-dev.ucsc pins.
+                # 8.4 is the forward-compatibility check.
+                php-version: ['8.1', '8.4']
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v6.0.2
+
+            - name: Set up PHP
+              uses: shivammathur/setup-php@2.37.2
+              with:
+                  php-version: ${{ matrix.php-version }}
+                  coverage: none
+                  tools: composer
+
+            - name: Install Composer dependencies
+              run: composer install --no-progress --no-interaction
+
+            - name: Run PHPCS
+              run: composer lint
