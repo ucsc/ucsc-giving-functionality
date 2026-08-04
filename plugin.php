@@ -5,6 +5,7 @@
  * Description: Adds custom functionality to UCSC Giving Website.
  * Version: 0.5.8
  * Requires at least: 6.5.0
+ * Requires PHP: 8.1
  * Author: UC Santa Cruz
  * Author URI: https://github.com/ucsc
  * License: GPL3
