@@ -82,4 +82,4 @@ The updater parses the header with a single regex covering multi-digit segments 
 
 ## Related
 
-`.github/copilot-instructions.md` covers much of the same ground for GitHub Copilot. Keep the two roughly in sync when conventions change; note it still refers to `standard-version`, which was replaced by `commit-and-tag-version`.
+`.github/copilot-instructions.md` covers much of the same ground for GitHub Copilot. Keep the two roughly in sync when conventions change.

@@ -117,8 +117,8 @@ The suite covers functions that are pure once WordPress is stubbed. Anything nee
   [#137](https://github.com/ucsc/ucsc-giving-functionality/issues/137) bumped `@wordpress/scripts` 30 → 34 and applied the non-breaking fixes, taking `npm audit` from 63 to 29 and clearing every critical. What remains is held behind `semver-major` bumps inside that tree — `adm-zip`, `markdown-it`/`linkify-it`, `minimatch`, and `webpack-dev-server` via `sockjs` — so it cannot be cleared without either forcing breaking upgrades or waiting for upstream. Not worth forcing, given zero production exposure.
 
   The durable fix is to stop depending on that tree at all: `plugin-zip` is the only thing used from it. A smaller dependency, or a short zip script, would remove the entire alert surface permanently. Worth considering the next time this backlog becomes annoying.
-- **`.github/copilot-instructions.md` has drifted** — it still documents `standard-version`, replaced by `commit-and-tag-version` in a19905c. Keep it in sync with `CLAUDE.md` when conventions change.
-- **Automated daily-repo-status issues** accounted for most of the closed-issue history (#94–#118). If that workflow is still active, consider whether the signal justifies the noise in the issue tracker.
+- **Keep `.github/copilot-instructions.md` in sync with `CLAUDE.md`.** The two cover much of the same ground for different agents, and the copilot file drifts more easily because nothing reads it during normal work. It documented `standard-version` for four months after a19905c replaced it with `commit-and-tag-version` on 2026-03-18; corrected in [#138](https://github.com/ucsc/ucsc-giving-functionality/issues/138). Worth a glance whenever a convention, command or dependency changes.
+- **The daily-repo-status workflow has been removed**, and with it the bulk of the closed-issue history it generated (#94–#118). `.github/workflows/` now holds only `ci.yml` and `release.yml`. The `daily-status` and `report` labels are kept deliberately — 88 closed issues carry each, and deleting a label strips it from every issue, which would make that history unfilterable for no benefit.
 
 ---
 
