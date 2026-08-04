@@ -4,8 +4,8 @@
 
 <!-- wp:group {"tagName":"main","className":"content-region","style":{"spacing":{"margin":{"top":"var:preset|spacing|50"}}},"layout":{"inherit":true,"type":"constrained"}} -->
 <main class="wp-block-group content-region" style="margin-top:var(--wp--preset--spacing--50)"><!-- wp:query-title {"type":"archive","textAlign":"center","showPrefix":false} /-->
-<?php require 'parts/funds-search.php'; ?>
-<?php require 'parts/post-query-funds.php'; ?>
+<?php require __DIR__ . '/parts/funds-search.php'; ?>
+<?php require __DIR__ . '/parts/post-query-funds.php'; ?>
 </main>
 <!-- /wp:group -->
 

@@ -60,7 +60,7 @@ So the same URL is computed by two different paths — `ucscgiving_fund_url()` f
 `lib/templates/*.php` are block-comment markup (`<!-- wp:… -->`) with a couple of `require` statements, not PHP source. They are read through `ucscgiving_get_template_content()` (output buffering) and handed to `register_block_template()` in `plugin.php`.
 
 Two consequences:
-- The `require 'parts/…'` calls inside them use **relative paths**, which resolve only because PHP falls back to the calling file's directory. Fragile — prefer `__DIR__` if touching them.
+- The `require __DIR__ . '/parts/…'` calls inside them are explicitly rooted. Keep them that way — they were relative paths until #134, resolving only because PHP falls back to the calling file's directory.
 - PHPCS file-docblock sniffs are excluded for `lib/templates/` in `.phpcs.xml.dist`, since a file docblock there is meaningless.
 
 ## Conventions
