@@ -76,7 +76,7 @@ PHPCS is configured in `.phpcs.xml.dist`:
 ```bash
 npm run zip           # Create distributable plugin ZIP via @wordpress/scripts
 ```
-Only files listed in the `"files"` array in `package.json` are included: `acf-json/`, `lib/`, `plugin.php`, `README.md`, `CHANGELOG.md`, `LICENSE`.
+Files listed in the `"files"` array in `package.json` are included: `acf-json/`, `lib/`, `plugin.php`, `README.md`, `CHANGELOG.md`, `LICENSE`. `package.json` itself is also included — npm-packlist always ships it regardless of `files`. CI asserts the ZIP contents on every pull request.
 
 ## Plugin-Specific Patterns
 

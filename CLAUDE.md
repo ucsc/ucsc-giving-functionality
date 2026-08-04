@@ -17,7 +17,7 @@ npm run dryrun        # Preview version bump + changelog
 npm run release       # Tag a release and update CHANGELOG.md
 ```
 
-`composer lint` and `composer test` both run on every pull request via `.github/workflows/ci.yml` (PHP 8.1 and 8.4). `release.yml` still only fires on tags.
+`composer lint` and `composer test` both run on every pull request via `.github/workflows/ci.yml` (PHP 8.1 and 8.4), alongside a `package` job that builds the distributable ZIP and asserts its contents. `release.yml` still only fires on tags.
 
 **The PHPUnit suite stubs WordPress rather than running inside it.** `tests/bootstrap.php` supplies WordPress stand-ins, so the suite needs no WordPress, no database, no ACF Pro licence and no theme — but it therefore only covers functions that are pure once WordPress is stubbed. There is no wp-env config and no JS test suite, both deliberately; see ROADMAP §3.
 
@@ -76,7 +76,7 @@ Releases are driven by **conventional commits** — `commit-and-tag-version` rea
 
 `npm run release` bumps `package.json`, `package-lock.json`, and the `Version:` header in `plugin.php` (via the custom updater `wp-plugin-version-updater.js`). Pushing a `v*.*.*` tag triggers `.github/workflows/release.yml`, which delegates to the shared `ucsc/actions` workflow and publishes `ucsc-giving-functionality-plugin.zip`.
 
-Only paths in the `files` array of `package.json` ship in the ZIP: `acf-json/`, `lib/`, `plugin.php`, `README.md`, `CHANGELOG.md`, `LICENSE`.
+Paths in the `files` array of `package.json` ship in the ZIP: `acf-json/`, `lib/`, `plugin.php`, `README.md`, `CHANGELOG.md`, `LICENSE`. **`package.json` itself also ships** — npm-packlist always includes it regardless of `files`, so it cannot be excluded. `ci.yml` asserts the full contents on every PR.
 
 The updater parses the header with a single regex covering multi-digit segments and an optional prerelease suffix, and throws rather than writing if the header is missing — keep both `readVersion` and `writeVersion` on that shared pattern so they cannot diverge.
 
