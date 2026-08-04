@@ -108,7 +108,7 @@ The suite covers functions that are pure once WordPress is stubbed. Anything nee
 
   Worth noting the two are entangled: the inlined templates are also the ones carrying the hardcoded production media ([#133](https://github.com/ucsc/ucsc-giving-functionality/issues/133)) and the unpinned template-part references ([#136](https://github.com/ucsc/ucsc-giving-functionality/issues/136)). Whoever picks up the composition question should look at all three together rather than in isolation.
 
-- **Single URL-construction path.** `ucscgiving_fund_url()` (block binding) and `ucscgiving_link_filter()` (permalink) build the same URL independently. Extract one helper so they cannot diverge. Both now have characterization tests (§3), so the extraction can be made and shown to preserve behavior — this is the cheapest remaining item.
+- ~~**Single URL-construction path.**~~ Done in [#135](https://github.com/ucsc/ucsc-giving-functionality/issues/135) — both callers now compose the URL through `ucscgiving_build_fund_url()`, with a test asserting they agree. The extraction surfaced that the two had *already* drifted: the binding dropped a designation code of `"0"` where the permalink filter kept it. Unified on the filter's behavior.
 
 ## 5. Maintenance
 

@@ -51,7 +51,7 @@ This is the core behavior. Funds carry a `fund-type` term and a `designation` po
 - **`Standard` fund type** → `ucscgiving_link_filter()` (on `post_type_link`) replaces the permalink with `base_url . designation`, sending visitors straight to the external giving form.
 - **Anything else** (the README calls these "Priority") → keeps its normal permalink and renders `single-fund.php`, where a **block binding** (`ucscgiving/fund-url`, registered in `general.php`) supplies the same computed URL to the "Give" button.
 
-So the same URL is computed by two different paths — `ucscgiving_fund_url()` for the binding, `ucscgiving_link_filter()` for the permalink. Changes to URL construction must be made in both or they will drift.
+Both paths compose that URL through **`ucscgiving_build_fund_url( $post_id )`** — the one place it is built. Change URL construction there, not in the callers. The callers differ only in what they do when there is no `base_url`: the binding returns an empty string, the permalink filter returns the unmodified permalink. `tests/php/BuildFundUrlTest.php` has a guard asserting the two agree.
 
 `fund-type-term` is an ACF taxonomy field with `return_format = id`, so it yields a term ID that needs `get_term()` to resolve.
 

@@ -31,6 +31,32 @@ function ucscgiving_register_fund_url_block_binding() {
 }
 
 /**
+ * Build the external Giving URL for a fund
+ *
+ * The single place the Giving URL is composed. Both the block binding and the
+ * permalink filter go through here so the two cannot drift apart.
+ *
+ * `base_url` lives on an ACF options page registered by the ucsc-2022 theme,
+ * not by this plugin, so it is empty whenever that theme is inactive. This
+ * returns an empty string in that case and leaves the callers to decide what
+ * to do about it — they legitimately differ.
+ *
+ * @param int $post_id Fund post ID.
+ * @return string The escaped Giving URL, or an empty string if no base URL is set.
+ */
+function ucscgiving_build_fund_url( $post_id ) {
+	$baseurl = get_field( 'base_url', 'option' );
+
+	if ( empty( $baseurl ) ) {
+		return '';
+	}
+
+	$designation = get_post_meta( $post_id, 'designation', true );
+
+	return esc_url( $baseurl . $designation );
+}
+
+/**
  * Get Fund URL
  *
  * Callback function that returns the Fund URL
@@ -38,19 +64,7 @@ function ucscgiving_register_fund_url_block_binding() {
  * @return string
  */
 function ucscgiving_fund_url() {
-	$baseurl     = get_field( 'base_url', 'option' );
-	$designation = get_post_meta( get_the_ID(), 'designation', true );
-	$fundurl     = '';
-
-	if ( ! empty( $baseurl ) && ! empty( $designation ) ) {
-		$fundurl = $baseurl . $designation;
-	} elseif ( ! empty( $baseurl ) ) {
-		$fundurl = $baseurl;
-	} else {
-		$fundurl = '';
-	}
-
-	return esc_url( $fundurl );
+	return ucscgiving_build_fund_url( get_the_ID() );
 }
 
 /**
@@ -82,15 +96,15 @@ function ucscgiving_link_filter( $post_link, $post ) {
 		return $post_link;
 	}
 
-	$baseurl = get_field( 'base_url', 'option' );
+	$fund_url = ucscgiving_build_fund_url( $post->ID );
 
-	if ( empty( $baseurl ) ) {
+	// No base URL means nothing to link out to, so keep the real permalink
+	// rather than sending visitors to a truncated address.
+	if ( '' === $fund_url ) {
 		return $post_link;
 	}
 
-	$designation = get_post_meta( $post->ID, 'designation', true );
-
-	return esc_url( $baseurl . $designation );
+	return $fund_url;
 }
 
 add_filter( 'post_type_link', 'ucscgiving_link_filter', 10, 2 );
