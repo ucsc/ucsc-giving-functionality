@@ -6,6 +6,10 @@
 # The PHPUnit suite is unit-level: tests/bootstrap.php stubs WordPress, so no
 # WordPress install, database, ACF Pro licence or ucsc-2022 theme is needed
 # here. See issue #129 for why full integration testing is out of scope.
+#
+# The package job guards the distributable. `plugin-zip` is the only thing used
+# from @wordpress/scripts, so a dependency bump that breaks it would otherwise
+# only surface when a release tag is pushed.
 
 name: CI
 
@@ -56,3 +60,70 @@ jobs:
 
             - name: Run PHPUnit
               run: composer test
+
+    package:
+        name: Build ZIP
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v6.0.2
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v6.4.0
+              with:
+                  # Matches the default in the shared ucsc/actions release
+                  # workflow, so this builds the ZIP the same way a release does.
+                  node-version: '24'
+                  cache: 'npm'
+
+            # `npm ci` rather than `npm install`: it also fails if
+            # package-lock.json has drifted out of sync with package.json.
+            - name: Install Node dependencies
+              run: npm ci
+
+            - name: Build the distributable ZIP
+              run: npm run zip
+
+            - name: Verify ZIP contents
+              run: |
+                  set -euo pipefail
+                  zip='ucsc-giving-functionality-plugin.zip'
+                  root='ucsc-giving-functionality-plugin'
+
+                  if [ ! -f "$zip" ]; then
+                      echo "::error::$zip was not produced"
+                      exit 1
+                  fi
+
+                  entries="$(unzip -Z1 "$zip" | sort)"
+                  echo "$entries"
+
+                  fail=0
+
+                  # Everything the `files` array in package.json promises to
+                  # ship, plus package.json itself — npm-packlist always
+                  # includes that regardless of `files`, so it is expected.
+                  for path in plugin.php README.md CHANGELOG.md LICENSE package.json; do
+                      if ! printf '%s\n' "$entries" | grep -qxF "$root/$path"; then
+                          echo "::error::ZIP is missing $path"
+                          fail=1
+                      fi
+                  done
+
+                  for dir in acf-json lib; do
+                      if ! printf '%s\n' "$entries" | grep -q "^$root/$dir/"; then
+                          echo "::error::ZIP is missing $dir/"
+                          fail=1
+                      fi
+                  done
+
+                  # Nothing here may ever ship to a WordPress site.
+                  forbidden="^$root/(tests/|node_modules/|vendor/|\.github/|phpunit\.xml\.dist$|composer\.(json|lock)$|package-lock\.json$)"
+                  if printf '%s\n' "$entries" | grep -Eq "$forbidden"; then
+                      echo "::error::ZIP contains files that must not ship:"
+                      printf '%s\n' "$entries" | grep -E "$forbidden"
+                      fail=1
+                  fi
+
+                  exit "$fail"

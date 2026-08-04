@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/ucsc/ucsc-giving-functionality-plugin#readme",
   "devDependencies": {
-    "@wordpress/scripts": "^30.12.0",
+    "@wordpress/scripts": "^34.0.0",
     "commit-and-tag-version": "^12.7.1"
   },
   "files": [

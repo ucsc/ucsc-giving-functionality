@@ -112,7 +112,11 @@ The suite covers functions that are pure once WordPress is stubbed. Anything nee
 
 ## 5. Maintenance
 
-- **Dependabot: 104 open alerts, all `development` scope.** Zero production-scope alerts, and the shipped ZIP contains only `acf-json/`, `lib/`, `plugin.php`, and docs — no `node_modules`. **Nothing here reaches a WordPress site.** The cluster is the `@wordpress/scripts` transitive tree (axios, webpack-dev-server, node-forge, handlebars). Bumping `@wordpress/scripts` should clear most of it. Real, but a housekeeping item rather than a security incident.
+- **Dependabot alerts are all `development` scope.** Zero production-scope, and the shipped ZIP contains only `acf-json/`, `lib/`, `plugin.php` and docs — no `node_modules`. **Nothing here reaches a WordPress site.** The whole backlog is the `@wordpress/scripts` transitive tree, which exists solely to provide `plugin-zip`; the plugin ships no JavaScript and has no build step. Housekeeping, not a security matter — and worth remembering before a raw alert count is read as risk.
+
+  [#137](https://github.com/ucsc/ucsc-giving-functionality/issues/137) bumped `@wordpress/scripts` 30 → 34 and applied the non-breaking fixes, taking `npm audit` from 63 to 29 and clearing every critical. What remains is held behind `semver-major` bumps inside that tree — `adm-zip`, `markdown-it`/`linkify-it`, `minimatch`, and `webpack-dev-server` via `sockjs` — so it cannot be cleared without either forcing breaking upgrades or waiting for upstream. Not worth forcing, given zero production exposure.
+
+  The durable fix is to stop depending on that tree at all: `plugin-zip` is the only thing used from it. A smaller dependency, or a short zip script, would remove the entire alert surface permanently. Worth considering the next time this backlog becomes annoying.
 - **`.github/copilot-instructions.md` has drifted** — it still documents `standard-version`, replaced by `commit-and-tag-version` in a19905c. Keep it in sync with `CLAUDE.md` when conventions change.
 - **Automated daily-repo-status issues** accounted for most of the closed-issue history (#94–#118). If that workflow is still active, consider whether the signal justifies the noise in the issue tracker.
 

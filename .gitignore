@@ -56,3 +56,6 @@ node_modules
 # PHPUnit
 .phpunit.cache/
 .phpunit.result.cache
+
+# Build artifact from `npm run zip`
+ucsc-giving-functionality-plugin.zip
