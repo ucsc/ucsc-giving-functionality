@@ -53,7 +53,14 @@
 	<rule ref="WordPress-Docs"/>
 
 	<!-- Add in some extra rules from other standards. -->
-	<rule ref="Generic.CodeAnalysis.UnusedFunctionParameter"/>
+	<rule ref="Generic.CodeAnalysis.UnusedFunctionParameter">
+		<!--
+		The WordPress stand-ins in tests/stubs.php mirror core signatures so
+		the plugin can be loaded, and deliberately ignore most of what they
+		are handed.
+		-->
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
 	<rule ref="Generic.Commenting.Todo"/>
 
 	<!-- Check for PHP cross-version compatibility. -->
@@ -97,6 +104,12 @@
 				<element value="ucscgiving"/>
 			</property>
 		</properties>
+		<!--
+		tests/ declares stand-ins for WordPress core and ACF functions
+		(get_field(), add_action(), …) plus PHPUnit test classes. Neither can
+		carry the plugin prefix and still do its job.
+		-->
+		<exclude-pattern>/tests/*</exclude-pattern>
 	</rule>
 
 	<!--
