@@ -23,7 +23,7 @@ npm install            # Install Node dev dependencies (@wordpress/scripts, stan
 - **Main file**: `plugin.php` - Entry point with template registration and ACF JSON configuration
 - **Functions**: Split into `lib/functions/general.php` (block bindings, search variations) and `lib/functions/settings.php` (admin settings page)
 - **Templates**: `lib/templates/` contains block-based templates for single funds and taxonomy archives
-- **Template Parts**: `lib/templates/parts/` contains reusable template partials (`funds-search.php`, `post-query-funds.php`, `post-query.php`)
+- **Template Parts**: `lib/templates/parts/` contains reusable template partials (`funds-search.php`, `post-query-funds.php`), pulled in with `__DIR__`-relative `require`
 - **Styles**: `lib/css/admin-settings.css` - Admin settings page styles
 - **ACF Configuration**: `acf-json/` directory stores Advanced Custom Fields configuration as JSON
 

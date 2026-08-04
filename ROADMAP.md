@@ -92,7 +92,22 @@ The suite covers functions that are pure once WordPress is stubbed. Anything nee
 
 ## 4. Harden packaging and templates
 
-- **Relative `require` in block templates.** `lib/templates/*.php` use `require 'parts/…'`, which resolves only because PHP falls back to the calling file's directory. Change to `__DIR__`-relative paths. Low effort, removes a latent break.
+- ~~**Relative `require` in block templates.**~~ Done in [#134](https://github.com/ucsc/ucsc-giving-functionality/issues/134) — both calls are now `__DIR__`-rooted, and the unused `parts/post-query.php` was removed with them.
+- **Template composition is split two ways.** *Needs a look before anything is decided.*
+
+  | Template | Lines | Composition |
+  |---|---|---|
+  | `taxonomy-fund-type.php` | 11 | `require`s `parts/funds-search.php` + `parts/post-query-funds.php` |
+  | `taxonomy-fund-theme.php` | 11 | same |
+  | `taxonomy-area.php` | 74 | fully inlined |
+  | `taxonomy-keyword.php` | 74 | fully inlined |
+  | `archive-fund.php` | 74 | fully inlined |
+  | `single-fund.php` | 30 | fully inlined |
+
+  The two inlined taxonomy templates are near-identical to each other, so there is real duplication: a change to the archive layout currently has to be made in both, and neither picks up edits to `parts/`. Converting them to the parts pattern would remove that, but it changes rendered markup and needs visual QA, so it is not a mechanical cleanup.
+
+  Worth noting the two are entangled: the inlined templates are also the ones carrying the hardcoded production media ([#133](https://github.com/ucsc/ucsc-giving-functionality/issues/133)) and the unpinned template-part references ([#136](https://github.com/ucsc/ucsc-giving-functionality/issues/136)). Whoever picks up the composition question should look at all three together rather than in isolation.
+
 - **Single URL-construction path.** `ucscgiving_fund_url()` (block binding) and `ucscgiving_link_filter()` (permalink) build the same URL independently. Extract one helper so they cannot diverge. Both now have characterization tests (§3), so the extraction can be made and shown to preserve behavior — this is the cheapest remaining item.
 
 ## 5. Maintenance
