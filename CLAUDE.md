@@ -10,15 +10,18 @@ npm install           # Node dev deps (@wordpress/scripts, commit-and-tag-versio
 
 composer lint         # PHPCS across the repo
 composer lint-fix     # PHPCBF auto-fix
+composer test         # PHPUnit (needs ext-mbstring)
 
 npm run zip           # Build distributable ZIP (wp-scripts plugin-zip)
 npm run dryrun        # Preview version bump + changelog
 npm run release       # Tag a release and update CHANGELOG.md
 ```
 
-There is **no automated test suite** — no PHPUnit, no wp-env config, no JS tests. `composer lint` is the only mechanical gate. Validate behavior by hand against a WordPress install with ACF Pro and the `ucsc-2022` theme active.
+`composer lint` and `composer test` both run on every pull request via `.github/workflows/ci.yml` (PHP 8.1 and 8.4). `release.yml` still only fires on tags.
 
-`composer lint` runs on every pull request via `.github/workflows/ci.yml` (PHP 8.1 and 8.4), so a style regression fails the PR. `release.yml` still only fires on tags.
+**The PHPUnit suite stubs WordPress rather than running inside it.** `tests/bootstrap.php` supplies WordPress stand-ins, so the suite needs no WordPress, no database, no ACF Pro licence and no theme — but it therefore only covers functions that are pure once WordPress is stubbed. There is no wp-env config and no JS test suite, both deliberately; see ROADMAP §3.
+
+Anything touching a running WordPress — block template registration, the ACF JSON round-trip, the fund-type save cycle — still has to be validated by hand against an install with ACF Pro and the `ucsc-2022` theme active.
 
 ## Repository shape
 
