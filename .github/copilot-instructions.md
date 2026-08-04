@@ -14,7 +14,7 @@ WordPress plugin that creates a custom post type "Fund" for the UCSC Giving webs
 ### Install Dependencies
 ```bash
 composer install       # Install PHP dev dependencies (PHPCS + WordPress Coding Standards)
-npm install            # Install Node dev dependencies (@wordpress/scripts, standard-version)
+npm install            # Install Node dev dependencies (@wordpress/scripts, commit-and-tag-version)
 ```
 
 ## Architecture & Key Components
@@ -54,7 +54,7 @@ Configured via ACF JSON files in `acf-json/`:
 ## Development Workflows
 
 ### Version Management
-Uses `standard-version` for automated releases:
+Uses `commit-and-tag-version` for automated releases, driven by **conventional commits** — the commit prefix is functional, not cosmetic (`fix:` → patch, `feat:` → minor, `chore:`/`ci:`/`docs:` → no bump):
 ```bash
 npm run release        # Create new version tag and update CHANGELOG.md
 npm run dryrun         # Preview version bump and changelog changes
@@ -117,7 +117,7 @@ Fund search results are returned using the archive template via `ucscgiving_fund
 - **Template parts (reusable blocks)**: `lib/templates/parts/`
 - **Field changes**: Manage via ACF admin (auto-exports to `acf-json/`)
 - **Styling**: Admin CSS in `lib/css/admin-settings.css`
-- **Version bumping**: `wp-plugin-version-updater.js` + `package.json` `standard-version` config
+- **Version bumping**: `wp-plugin-version-updater.js` + `package.json` `commit-and-tag-version` config
 
 ## Dependencies
 - WordPress 6.5+ (required for Block Bindings API via `register_block_bindings_source`)
