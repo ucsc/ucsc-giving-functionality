@@ -3,7 +3,7 @@
  * Plugin Name: UCSC Giving Functionality
  * Plugin URI: https://github.com/ucsc/ucsc-giving-functionality-plugin
  * Description: Adds custom functionality to UCSC Giving Website.
- * Version: 0.5.8
+ * Version: 0.5.9
  * Requires at least: 6.5.0
  * Requires PHP: 8.1
  * Author: UC Santa Cruz
