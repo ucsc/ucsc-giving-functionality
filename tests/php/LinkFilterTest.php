@@ -55,7 +55,7 @@ class LinkFilterTest extends TestCase {
 	 * @return object
 	 */
 	private function make_fund( $post_id = 7, $term_name = 'Standard' ) {
-		UCSCGiving_Test_State::$object_terms[ $post_id . ':fund-type' ] = array( $term_name );
+		UCSCGiving_Test_State::$object_terms[ $post_id . ':fund-type' ] = array( 99 => $term_name );
 
 		return $this->make_post( $post_id, 'fund' );
 	}
@@ -93,7 +93,7 @@ class LinkFilterTest extends TestCase {
 	public function test_returns_permalink_when_the_term_belongs_to_another_post() {
 		UCSCGiving_Test_State::$fields['base_url']          = 'https://give.example.edu/fund/';
 		UCSCGiving_Test_State::$meta['7:designation']       = 'ABC123';
-		UCSCGiving_Test_State::$object_terms['8:fund-type'] = array( 'Standard' );
+		UCSCGiving_Test_State::$object_terms['8:fund-type'] = array( 99 => 'Standard' );
 
 		$post = $this->make_post( 7, 'fund' );
 
@@ -108,7 +108,7 @@ class LinkFilterTest extends TestCase {
 	public function test_returns_permalink_when_standard_is_in_another_taxonomy() {
 		UCSCGiving_Test_State::$fields['base_url']     = 'https://give.example.edu/fund/';
 		UCSCGiving_Test_State::$meta['7:designation']  = 'ABC123';
-		UCSCGiving_Test_State::$object_terms['7:area'] = array( 'Standard' );
+		UCSCGiving_Test_State::$object_terms['7:area'] = array( 42 => 'Standard' );
 
 		$post = $this->make_post( 7, 'fund' );
 
@@ -116,20 +116,22 @@ class LinkFilterTest extends TestCase {
 	}
 
 	/**
-	 * Documents the risk the taxonomy panel introduces.
+	 * Defence in depth: a multi-term fund still resolves to one destination.
 	 *
-	 * The ACF radio this replaced could hold one value. WordPress renders a
-	 * hierarchical taxonomy as a checkbox list, so an editor can now tick
-	 * Standard *and* Priority, and the fund links out. Nothing in the data
-	 * model prevents it; this pins what happens when it occurs rather than
-	 * claiming it is desirable.
+	 * A fund should never carry two fund types — the editor offers a radio and
+	 * ucscgiving_enforce_single_fund_type() normalises anything that gets past
+	 * it. Should one reach the read path anyway, the permalink must still be
+	 * decided rather than left ambiguous. This pins which way it goes.
 	 *
 	 * @return void
 	 */
 	public function test_links_out_when_standard_is_one_of_several_terms() {
 		UCSCGiving_Test_State::$fields['base_url']          = 'https://give.example.edu/fund/';
 		UCSCGiving_Test_State::$meta['7:designation']       = 'ABC123';
-		UCSCGiving_Test_State::$object_terms['7:fund-type'] = array( 'Priority', 'Standard' );
+		UCSCGiving_Test_State::$object_terms['7:fund-type'] = array(
+			98 => 'Priority',
+			99 => 'Standard',
+		);
 
 		$post = $this->make_post( 7, 'fund' );
 

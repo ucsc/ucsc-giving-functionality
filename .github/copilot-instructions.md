@@ -25,6 +25,7 @@ npm install            # Install Node dev dependencies (@wordpress/scripts, comm
 - **Templates**: `lib/templates/` contains block-based templates for single funds and taxonomy archives
 - **Template Parts**: `lib/templates/parts/` contains reusable template partials (`funds-search.php`, `post-query-funds.php`), pulled in with `__DIR__`-relative `require`
 - **Styles**: `lib/css/admin-settings.css` - Admin settings page styles
+- **Scripts**: `lib/js/fund-type-radio.js` - the only browser JavaScript. Hand-written against the `wp.*` globals, no build step and no bundler; nothing lints it, so match the surrounding style by hand. Both this and the CSS are enqueued from `plugin.php`, because `plugin_dir_url( __FILE__ )` only resolves correctly from there.
 - **ACF Configuration**: `acf-json/` directory stores Advanced Custom Fields configuration as JSON
 
 ### Block Bindings Integration
@@ -49,6 +50,7 @@ Configured via ACF JSON files in `acf-json/`:
 - **Post Type**: `fund` with custom labels and permalink structure (`post_type_67b609ae42d72.json`)
 - **Taxonomies**: area, fund-theme, fund-type, keyword — all attached to the `fund` post type
 - **`fund-type` owns fund type outright** (#3): `show_ui: 1` and `show_in_rest: 1`, edited through the standard taxonomy panel. Do not add an ACF taxonomy field targeting `fund-type` — that reintroduces the second writer behind the old double-save bug.
+- **A fund is Standard or Priority, never both.** `lib/js/fund-type-radio.js` makes the editor panel a radio via the `editor.PostTaxonomyType` filter (`meta_box_cb` does not work — the block editor discards taxonomy meta boxes unconditionally), and `ucscgiving_enforce_single_fund_type()` on `set_object_terms` normalises Quick Edit, Bulk Edit, REST and WP-CLI writes. Do not move that to `save_post`: the REST controller fires it before `handle_terms()` writes the terms.
 - **Field Groups**: Fund designation code, button text (`group_67b76c100ca57.json`, `group_67c4adfce3d52.json`)
 - **Meta Fields**: `designation` (post meta), `button_text` (post meta), `base_url` (global ACF option)
 
@@ -119,6 +121,7 @@ Fund search results are returned using the archive template via `ucscgiving_fund
 - **Template parts (reusable blocks)**: `lib/templates/parts/`
 - **Field changes**: Manage via ACF admin (auto-exports to `acf-json/`)
 - **Styling**: Admin CSS in `lib/css/admin-settings.css`
+- **Block editor behavior**: `lib/js/fund-type-radio.js`, enqueued from `plugin.php`
 - **Version bumping**: `wp-plugin-version-updater.js` + `package.json` `commit-and-tag-version` config
 
 ## Dependencies
@@ -134,4 +137,5 @@ The suite stubs WordPress (`tests/bootstrap.php`) rather than running inside it,
 - Verify block bindings render correct URLs in the block editor and on the front end
 - Check the "Fund Search" block variation appears in the block inserter
 - Validate ACF fields save correctly and that values appear in templates
+- Confirm the Fund Type panel renders as radio buttons and a type change sticks on a single save — `lib/js/fund-type-radio.js` has no automated coverage
 - Run `composer lint` and `composer test` before committing; CI runs both and will fail the PR otherwise

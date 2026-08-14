@@ -42,9 +42,13 @@ No data migration was needed. `load_terms = 1` meant `get_field( 'fund-type-term
 
 `ucscgiving_link_filter()` reads `has_term( 'Standard', 'fund-type', $post->ID )` instead of `get_field()` + `get_term()`. That removed the `WP_Error` and `instanceof WP_Term` guards along with their tests, and with them the last need for the `WP_Term` and `WP_Error` doubles in `tests/doubles/` — the harness got smaller.
 
-### What it costs
+### Keeping the choice either/or
 
-WordPress renders a hierarchical taxonomy as a **checkbox list**, not a radio. An editor can therefore tick Standard *and* Priority on the same Fund, where the ACF field structurally could not; `has_term()` then matches and the fund links out. `LinkFilterTest::test_links_out_when_standard_is_one_of_several_terms()` pins that behaviour rather than pretending it cannot happen. If it becomes a real problem, the options are a `save_post` guard or a custom `meta_box_cb` rendering radios.
+A fund is Standard *or* Priority, never both. The ACF radio enforced that structurally; WordPress renders a hierarchical taxonomy as a **checkbox list**, which does not. Two things close that gap.
+
+**In the editor**, `lib/js/fund-type-radio.js` swaps the checkbox list for a `RadioControl` through the `editor.PostTaxonomyType` filter. That filter is the only supported route: core registers every taxonomy meta box with `__back_compat_meta_box => true` **unconditionally**, so a custom `meta_box_cb` is discarded by the block editor and would only ever appear in the classic editor. This is the plugin's **first browser JavaScript** — hand-written against the `wp.*` globals, no build step, no bundler, consistent with the non-goal below. Translatable strings are passed in from PHP via `wp_localize_script()` so the `ucscgiving` text domain stays where PHPCS enforces it.
+
+**Everywhere else**, `ucscgiving_enforce_single_fund_type()` on `set_object_terms` trims fund-type to one term. Quick Edit and Bulk Edit still render checkboxes, and REST clients, WP-CLI and imports never touch the admin at all. `set_object_terms` is the hook rather than `save_post` because `WP_REST_Posts_Controller::update_item()` runs `wp_update_post()` — and therefore `save_post` — *before* `handle_terms()` writes the terms; it would inspect the terms before they existed. This is a normaliser over the single store, not a third writer arbitrating between two.
 
 Also new to the admin, both by-products of `show_ui`: a **Fund Types** submenu for term management, and a fund-type control in Quick Edit.
 
@@ -52,7 +56,10 @@ Also new to the admin, both by-products of `show_ui`: a **Fund Types** submenu f
 
 ### Still hand-verified
 
-The save cycle itself. The PHPUnit suite stubs WordPress, so nothing automated exercises `handle_terms()` — changing a Fund's type and saving once has to be checked against an install with ACF Pro and the `ucsc-2022` theme active. See §3.
+Two things, both beyond a WordPress-stubbing suite:
+
+- **The save cycle.** Nothing automated exercises `handle_terms()` — changing a Fund's type and saving once has to be checked against an install with ACF Pro and the `ucsc-2022` theme active. See §3.
+- **The radio control.** There is no JavaScript test harness and none is proposed. `SingleFundTypeTest` covers the PHP normaliser, which is the half that guarantees the data; the editor affordance is checked by hand.
 
 ## 2. Reduce coupling to the `ucsc-2022` theme
 
@@ -74,7 +81,7 @@ The middle option also gives the existing settings page a reason to exist beyond
 **Largely done.** [#127](https://github.com/ucsc/ucsc-giving-functionality/pull/130) and [#128](https://github.com/ucsc/ucsc-giving-functionality/pull/131) landed on 2026-08-04. What exists now:
 
 - **PR checks.** `.github/workflows/ci.yml` runs `composer lint` and `composer test` on every pull request, across PHP 8.1 and 8.4. Previously `release.yml` only fired on tags, so nothing validated a PR at all.
-- **A PHPUnit suite** — 36 tests over `ucscgiving_link_filter()` (every branch), `ucscgiving_build_fund_url()`, `ucscgiving_fund_url()`, `ucscgiving_fund_search_template()`, `ucscgiving_create_fund_search_variation()`, the two ACF JSON points, and the fund-type source-of-truth invariants from §1.
+- **A PHPUnit suite** — 43 tests over `ucscgiving_link_filter()` (every branch), `ucscgiving_build_fund_url()`, `ucscgiving_fund_url()`, `ucscgiving_fund_search_template()`, `ucscgiving_create_fund_search_variation()`, `ucscgiving_enforce_single_fund_type()`, the two ACF JSON points, and the fund-type source-of-truth invariants from §1. Nothing covers `lib/js/fund-type-radio.js`; see §1.
 
 ### Why the tests stub WordPress rather than run inside it
 
@@ -122,7 +129,7 @@ The suite covers functions that are pure once WordPress is stubbed. Anything nee
 
 ## 5. Maintenance
 
-- **Dependabot alerts are all `development` scope.** Zero production-scope, and the shipped ZIP contains only `acf-json/`, `lib/`, `plugin.php` and docs — no `node_modules`. **Nothing here reaches a WordPress site.** The whole backlog is the `@wordpress/scripts` transitive tree, which exists solely to provide `plugin-zip`; the plugin ships no JavaScript and has no build step. Housekeeping, not a security matter — and worth remembering before a raw alert count is read as risk.
+- **Dependabot alerts are all `development` scope.** Zero production-scope, and the shipped ZIP contains only `acf-json/`, `lib/`, `plugin.php` and docs — no `node_modules`. **Nothing here reaches a WordPress site.** The whole backlog is the `@wordpress/scripts` transitive tree, which exists solely to provide `plugin-zip`; the one JavaScript file the plugin ships is hand-written and has no build step. Housekeeping, not a security matter — and worth remembering before a raw alert count is read as risk.
 
   [#137](https://github.com/ucsc/ucsc-giving-functionality/issues/137) bumped `@wordpress/scripts` 30 → 34 and applied the non-breaking fixes, taking `npm audit` from 63 to 29 and clearing every critical. What remains is held behind `semver-major` bumps inside that tree — `adm-zip`, `markdown-it`/`linkify-it`, `minimatch`, and `webpack-dev-server` via `sockjs` — so it cannot be cleared without either forcing breaking upgrades or waiting for upstream. Not worth forcing, given zero production exposure.
 
@@ -137,4 +144,5 @@ The suite covers functions that are pure once WordPress is stubbed. Anything nee
 - **Integration tests against a real WordPress install.** Deliberate, not an oversight — see §3. The fund URL path depends on an ACF Pro options page registered by the `ucsc-2022` theme, so automating it in CI would mean holding a commercial licence key as a repository secret. The unit suite covers the logic; the rest is hand-verified.
 - Rewriting the plugin as class-based / namespaced. The procedural structure is small and consistent; churn here would buy little.
 - Registering the post type and taxonomies in PHP. `acf-json/` is the working source of truth and the ACF admin round-trips to it.
-- Shipping a build step for front-end assets. The plugin ships no JavaScript, and `@wordpress/scripts` is used only for `plugin-zip`.
+- Shipping a build step for front-end assets. The plugin ships no front-end JavaScript at all, and its one admin script (`lib/js/fund-type-radio.js`, §1) is written against the `wp.*` globals precisely so it needs no bundler. `@wordpress/scripts` is used only for `plugin-zip`.
+- A JavaScript test suite. One hand-written admin file does not justify the toolchain; the invariant it expresses is covered in PHP by `SingleFundTypeTest`, which is the half that actually protects the data.
