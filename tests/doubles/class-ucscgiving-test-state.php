@@ -28,11 +28,11 @@ final class UCSCGiving_Test_State {
 	public static $meta = array();
 
 	/**
-	 * Term objects, or WP_Error, keyed by term ID.
+	 * Term names assigned to a post, keyed by "{post_id}:{taxonomy}".
 	 *
-	 * @var array<int,mixed>
+	 * @var array<string,array<int,string>>
 	 */
-	public static $terms = array();
+	public static $object_terms = array();
 
 	/**
 	 * Value returned by is_search().
@@ -70,7 +70,7 @@ final class UCSCGiving_Test_State {
 	public static function reset() {
 		self::$fields           = array();
 		self::$meta             = array();
-		self::$terms            = array();
+		self::$object_terms     = array();
 		self::$is_search        = false;
 		self::$query_vars       = array();
 		self::$located_template = '';

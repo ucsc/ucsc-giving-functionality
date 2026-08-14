@@ -61,7 +61,12 @@ This is the core behavior. Funds carry a `fund-type` term and a `designation` po
 
 Both paths compose that URL through **`ucscgiving_build_fund_url( $post_id )`** — the one place it is built. Change URL construction there, not in the callers. The callers differ only in what they do when there is no `base_url`: the binding returns an empty string, the permalink filter returns the unmodified permalink. `tests/php/BuildFundUrlTest.php` has a guard asserting the two agree.
 
-`fund-type-term` is an ACF taxonomy field with `return_format = id`, so it yields a term ID that needs `get_term()` to resolve.
+**Fund type is owned by the `fund-type` taxonomy, not by ACF** (#3). `ucscgiving_link_filter()` reads it with `has_term( 'Standard', 'fund-type', $post->ID )` — there is no `fund-type-term` ACF field any more, and adding a taxonomy field targeting `fund-type` would reintroduce the second writer that caused the long-standing double-save bug. The taxonomy carries `show_ui = 1` **and** `show_in_rest = 1`; both are load-bearing, since the editor round-trips term state through REST and needs a panel that actually updates it.
+
+Two consequences worth remembering:
+
+-   Fund type is a **checkbox list** in the editor, so a Fund can carry both `Standard` and `Priority`. `has_term()` matches and the fund links out. Deliberate trade-off, pinned by a test in `tests/php/LinkFilterTest.php`.
+-   `acf-json/` round-trips through the ACF admin UI, so a re-export could silently add a field back. `tests/php/FundTypeSourceOfTruthTest.php` asserts against the JSON to catch that.
 
 ### Templates are block markup, not PHP
 

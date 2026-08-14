@@ -48,15 +48,14 @@ class LinkFilterTest extends TestCase {
 	}
 
 	/**
-	 * Build a fund post and point the stubs at a fund-type term.
+	 * Build a fund post and assign it a fund-type term.
 	 *
 	 * @param int    $post_id   Post ID.
 	 * @param string $term_name Fund type term name.
 	 * @return object
 	 */
 	private function make_fund( $post_id = 7, $term_name = 'Standard' ) {
-		UCSCGiving_Test_State::$fields['fund-type-term'] = 99;
-		UCSCGiving_Test_State::$terms[99]                = new WP_Term( 99, $term_name );
+		UCSCGiving_Test_State::$object_terms[ $post_id . ':fund-type' ] = array( $term_name );
 
 		return $this->make_post( $post_id, 'fund' );
 	}
@@ -84,13 +83,17 @@ class LinkFilterTest extends TestCase {
 	}
 
 	/**
-	 * A WP_Error from get_term() must not become a broken URL.
+	 * A fund-type term from a different post must not leak across.
+	 *
+	 * The filter asks about a specific post, so assigning the term to some
+	 * other post changes nothing here.
 	 *
 	 * @return void
 	 */
-	public function test_returns_permalink_when_get_term_returns_wp_error() {
-		UCSCGiving_Test_State::$fields['fund-type-term'] = 99;
-		UCSCGiving_Test_State::$terms[99]                = new WP_Error( 'invalid_taxonomy' );
+	public function test_returns_permalink_when_the_term_belongs_to_another_post() {
+		UCSCGiving_Test_State::$fields['base_url']          = 'https://give.example.edu/fund/';
+		UCSCGiving_Test_State::$meta['7:designation']       = 'ABC123';
+		UCSCGiving_Test_State::$object_terms['8:fund-type'] = array( 'Standard' );
 
 		$post = $this->make_post( 7, 'fund' );
 
@@ -98,16 +101,42 @@ class LinkFilterTest extends TestCase {
 	}
 
 	/**
-	 * A term ID that resolves to nothing is also non-fatal.
+	 * A "Standard" term in some other taxonomy is not a fund type.
 	 *
 	 * @return void
 	 */
-	public function test_returns_permalink_when_term_does_not_resolve() {
-		UCSCGiving_Test_State::$fields['fund-type-term'] = 99;
+	public function test_returns_permalink_when_standard_is_in_another_taxonomy() {
+		UCSCGiving_Test_State::$fields['base_url']     = 'https://give.example.edu/fund/';
+		UCSCGiving_Test_State::$meta['7:designation']  = 'ABC123';
+		UCSCGiving_Test_State::$object_terms['7:area'] = array( 'Standard' );
 
 		$post = $this->make_post( 7, 'fund' );
 
 		$this->assertSame( $this->permalink, ucscgiving_link_filter( $this->permalink, $post ) );
+	}
+
+	/**
+	 * Documents the risk the taxonomy panel introduces.
+	 *
+	 * The ACF radio this replaced could hold one value. WordPress renders a
+	 * hierarchical taxonomy as a checkbox list, so an editor can now tick
+	 * Standard *and* Priority, and the fund links out. Nothing in the data
+	 * model prevents it; this pins what happens when it occurs rather than
+	 * claiming it is desirable.
+	 *
+	 * @return void
+	 */
+	public function test_links_out_when_standard_is_one_of_several_terms() {
+		UCSCGiving_Test_State::$fields['base_url']          = 'https://give.example.edu/fund/';
+		UCSCGiving_Test_State::$meta['7:designation']       = 'ABC123';
+		UCSCGiving_Test_State::$object_terms['7:fund-type'] = array( 'Priority', 'Standard' );
+
+		$post = $this->make_post( 7, 'fund' );
+
+		$this->assertSame(
+			'https://give.example.edu/fund/ABC123',
+			ucscgiving_link_filter( $this->permalink, $post )
+		);
 	}
 
 	/**

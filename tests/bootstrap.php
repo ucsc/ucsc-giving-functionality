@@ -48,8 +48,6 @@ if ( file_exists( $ucscgiving_tests_dir . '/includes/functions.php' ) ) {
 	// and both plugin.php and lib/functions/*.php register hooks at file
 	// scope via add_action()/add_filter().
 	require_once __DIR__ . '/doubles/class-ucscgiving-test-state.php';
-	require_once __DIR__ . '/doubles/class-wp-error.php';
-	require_once __DIR__ . '/doubles/class-wp-term.php';
 	require_once __DIR__ . '/stubs.php';
 	require_once dirname( __DIR__ ) . '/plugin.php';
 }

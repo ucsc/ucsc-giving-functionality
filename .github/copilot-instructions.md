@@ -48,6 +48,7 @@ Block templates are registered programmatically in `plugin.php`:
 Configured via ACF JSON files in `acf-json/`:
 - **Post Type**: `fund` with custom labels and permalink structure (`post_type_67b609ae42d72.json`)
 - **Taxonomies**: area, fund-theme, fund-type, keyword — all attached to the `fund` post type
+- **`fund-type` owns fund type outright** (#3): `show_ui: 1` and `show_in_rest: 1`, edited through the standard taxonomy panel. Do not add an ACF taxonomy field targeting `fund-type` — that reintroduces the second writer behind the old double-save bug.
 - **Field Groups**: Fund designation code, button text (`group_67b76c100ca57.json`, `group_67c4adfce3d52.json`)
 - **Meta Fields**: `designation` (post meta), `button_text` (post meta), `base_url` (global ACF option)
 
@@ -88,7 +89,8 @@ Files listed in the `"files"` array in `package.json` are included: `acf-json/`,
 ### External Link Strategy
 - **Standard funds**: Permalinks redirected to external donation forms via `ucscgiving_link_filter()` (hooked to `post_type_link`)
 - **Priority funds**: Custom single page with dynamic "Give" button using block bindings
-- Fund URLs constructed: `base_url` (ACF global option) + `designation` (post meta field `designation`)
+- Fund URLs constructed: `base_url` (ACF global option) + `designation` (post meta field `designation`), composed in one place by `ucscgiving_build_fund_url()`
+- Fund type is read with `has_term( 'Standard', 'fund-type', $post->ID )` — straight from the taxonomy, which is the only place it is stored
 
 ### Search Functionality
 Custom search block variation scoped to Fund post type:
