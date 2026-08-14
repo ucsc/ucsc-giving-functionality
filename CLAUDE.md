@@ -2,6 +2,14 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project overview
+
+See @README.md for project overview
+
+## Roadmap management
+
+Always check @ROADMAP.md first to understand current priorities and progress.
+
 ## Commands
 
 ```bash
@@ -33,10 +41,10 @@ The code is **procedural, not class-based**: `plugin.php` plus two files in `lib
 
 Both of these live outside this repo and the plugin is substantially non-functional without them:
 
-- **ACF Pro** — declared via the `Requires Plugins: advanced-custom-fields-pro` header. Not on WP.org, so it cannot be installed automatically. All fund metadata flows through `get_field()`.
-- **The `ucsc-2022` theme** — two separate couplings:
-  - The `base_url` ACF field lives on the **`ucsc-theme-options` options page, which the theme registers**, not this plugin. Without the theme active, `get_field( 'base_url', 'option' )` returns nothing and every external fund URL silently collapses.
-  - Block templates reference the theme's template parts by name (`header`, `breadcrumbs`, `footer`, `theme":"ucsc-2022"`).
+-   **ACF Pro** — declared via the `Requires Plugins: advanced-custom-fields-pro` header. Not on WP.org, so it cannot be installed automatically. All fund metadata flows through `get_field()`.
+-   **The `ucsc-2022` theme** — two separate couplings:
+    -   The `base_url` ACF field lives on the **`ucsc-theme-options` options page, which the theme registers**, not this plugin. Without the theme active, `get_field( 'base_url', 'option' )` returns nothing and every external fund URL silently collapses.
+    -   Block templates reference the theme's template parts by name (`header`, `breadcrumbs`, `footer`, `theme":"ucsc-2022"`).
 
 ## Architecture
 
@@ -48,8 +56,8 @@ Both of these live outside this repo and the plugin is substantially non-functio
 
 This is the core behavior. Funds carry a `fund-type` term and a `designation` post meta value:
 
-- **`Standard` fund type** → `ucscgiving_link_filter()` (on `post_type_link`) replaces the permalink with `base_url . designation`, sending visitors straight to the external giving form.
-- **Anything else** (the README calls these "Priority") → keeps its normal permalink and renders `single-fund.php`, where a **block binding** (`ucscgiving/fund-url`, registered in `general.php`) supplies the same computed URL to the "Give" button.
+-   **`Standard` fund type** → `ucscgiving_link_filter()` (on `post_type_link`) replaces the permalink with `base_url . designation`, sending visitors straight to the external giving form.
+-   **Anything else** (the README calls these "Priority") → keeps its normal permalink and renders `single-fund.php`, where a **block binding** (`ucscgiving/fund-url`, registered in `general.php`) supplies the same computed URL to the "Give" button.
 
 Both paths compose that URL through **`ucscgiving_build_fund_url( $post_id )`** — the one place it is built. Change URL construction there, not in the callers. The callers differ only in what they do when there is no `base_url`: the binding returns an empty string, the permalink filter returns the unmodified permalink. `tests/php/BuildFundUrlTest.php` has a guard asserting the two agree.
 
@@ -60,15 +68,16 @@ Both paths compose that URL through **`ucscgiving_build_fund_url( $post_id )`** 
 `lib/templates/*.php` are block-comment markup (`<!-- wp:… -->`) with a couple of `require` statements, not PHP source. They are read through `ucscgiving_get_template_content()` (output buffering) and handed to `register_block_template()` in `plugin.php`.
 
 Two consequences:
-- The `require __DIR__ . '/parts/…'` calls inside them are explicitly rooted. Keep them that way — they were relative paths until #134, resolving only because PHP falls back to the calling file's directory.
-- PHPCS file-docblock sniffs are excluded for `lib/templates/` in `.phpcs.xml.dist`, since a file docblock there is meaningless.
+
+-   The `require __DIR__ . '/parts/…'` calls inside them are explicitly rooted. Keep them that way — they were relative paths until #134, resolving only because PHP falls back to the calling file's directory.
+-   PHPCS file-docblock sniffs are excluded for `lib/templates/` in `.phpcs.xml.dist`, since a file docblock there is meaningless.
 
 ## Conventions
 
-- **Prefix everything `ucscgiving_`** — functions, hooks, globals. PHPCS enforces this via `WordPress.NamingConventions.PrefixAllGlobals`.
-- **Text domain is `ucscgiving`** — enforced by PHPCS; a missing domain is a lint error.
-- PHPCS ruleset is `WordPress-Extra` + `WordPress-Docs`. The scan is **restricted to `extensions="php"`** because WPCS 3.x dropped its JS/CSS sniffs — do not re-widen it or `.css`/`.js` files will produce noise.
-- WordPress tabs for indentation in PHP, despite the `.editorconfig` (which is 4-space and applies mainly to non-PHP files).
+-   **Prefix everything `ucscgiving_`** — functions, hooks, globals. PHPCS enforces this via `WordPress.NamingConventions.PrefixAllGlobals`.
+-   **Text domain is `ucscgiving`** — enforced by PHPCS; a missing domain is a lint error.
+-   PHPCS ruleset is `WordPress-Extra` + `WordPress-Docs`. The scan is **restricted to `extensions="php"`** because WPCS 3.x dropped its JS/CSS sniffs — do not re-widen it or `.css`/`.js` files will produce noise.
+-   WordPress tabs for indentation in PHP, despite the `.editorconfig` (which is 4-space and applies mainly to non-PHP files).
 
 ## Releases
 
