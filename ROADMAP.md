@@ -8,16 +8,11 @@ This is a technical roadmap, not a product plan. Items are grounded in open issu
 
 ## In flight
 
-| Item | Tracking | State |
-|---|---|---|
-| Dual source of truth for fund type | [#3](https://github.com/ucsc/ucsc-giving-functionality/issues/3) | Open, **needs a decision** — see [§1](#1-resolve-the-dual-source-of-truth-for-fund-type) |
-
-### Needs a decision
-
-**#3 needs an owner to pick a data model.** The issue has been rewritten around the root cause rather than the double-save symptom; §1 below is the decision it is waiting on. PR [#21](https://github.com/ucsc/ucsc-giving-functionality/pull/21) — a Copilot draft that added a third writer on `rest_after_insert_fund` to correct the other two — was **closed unmerged** on 2026-08-04. It had gone stale and conflicted with [#121](https://github.com/ucsc/ucsc-giving-functionality/pull/121), which rewrote `ucscgiving_link_filter()` in the same file, and it treated the symptom rather than the dual ownership.
+Nothing. The dual source of truth for fund type ([#3](https://github.com/ucsc/ucsc-giving-functionality/issues/3)) was the last open item; see [§1](#1-fund-type-has-one-source-of-truth-the-taxonomy).
 
 ### Recently landed
 
+- [#3](https://github.com/ucsc/ucsc-giving-functionality/issues/3) — fund type now has exactly one writer. The ACF field `fund-type-term` is gone and the `fund-type` taxonomy has `show_ui` on, so the term is edited through WordPress's own panel and `handle_terms()` is the only thing writing it. See §1 for why this option was taken over the ACF one.
 - [#131](https://github.com/ucsc/ucsc-giving-functionality/pull/131) ([#128](https://github.com/ucsc/ucsc-giving-functionality/issues/128)) — the PHPUnit harness described in §3. First automated behavioral coverage in the repo.
 - [#130](https://github.com/ucsc/ucsc-giving-functionality/pull/130) ([#127](https://github.com/ucsc/ucsc-giving-functionality/issues/127)) — `ci.yml`, so pull requests are validated at all. Also declared the PHP floor (8.1), which had been recorded in neither `composer.json` nor the plugin header, and aligned the WPCS target version with `Requires at least`.
 - [#125](https://github.com/ucsc/ucsc-giving-functionality/pull/125) ([#122](https://github.com/ucsc/ucsc-giving-functionality/issues/122)) — `CLAUDE.md` and this roadmap.
@@ -26,23 +21,38 @@ This is a technical roadmap, not a product plan. Items are grounded in open issu
 
 ---
 
-## 1. Resolve the dual source of truth for fund type
+## 1. Fund type has one source of truth: the taxonomy
 
-**The highest-value architectural item.** Issue #3 describes the symptom — a Fund must be saved twice for a type change to stick — but the cause is structural: *fund type is stored in two places at once.*
+**Resolved.** Issue #3 described the symptom — a Fund had to be saved twice for a type change to stick — but the cause was structural: *fund type was stored in two places at once.*
 
-- The `fund-type` taxonomy holds the term. It is registered with `show_in_rest = 1` but `show_ui = 0`, so the Block Editor loads the post's term IDs into its entity state and writes them back through `handle_terms()` on every save — while giving the editor no panel that would ever update that state. It round-trips a stale value.
-- The ACF field `fund-type-term` (`field_67cc7f695ce26`) is a taxonomy field with `save_terms = 1` and `load_terms = 1`, so ACF **also** reads and writes that same term. This is the control the editor actually sees.
+- The `fund-type` taxonomy held the term. It was registered with `show_in_rest = 1` but `show_ui = 0`, so the Block Editor loaded the post's term IDs into its entity state and wrote them back through `handle_terms()` on every save — while giving the editor no panel that would ever update that state. It round-tripped a stale value.
+- The ACF field `fund-type-term` (`field_67cc7f695ce26`) was a taxonomy field with `save_terms = 1` and `load_terms = 1`, so ACF **also** read and wrote that same term. That was the control the editor actually showed.
 
-Two systems own the same value and write it on different passes of the save cycle, which is what produces the double-save.
+Two systems owned the same value and wrote it on different passes of the save cycle, which is what produced the double-save.
 
-The read path is entangled too. `load_terms = 1` means `get_field( 'fund-type-term' )` in `ucscgiving_link_filter()` resolves through the **taxonomy**, not through the `fund-type-term` meta row — so the two stores can diverge silently, and fund linking follows whichever writer won the last save.
+### The decision
 
-Worth deciding explicitly:
+**The taxonomy is the single source of truth.** The ACF field is deleted and `show_ui = 1` on the taxonomy, so fund type is edited through WordPress's own panel — the one whose state the editor already round-trips. `handle_terms()` is the only writer left, and there is only one store.
 
-- **Taxonomy as the single source of truth** — drop `save_terms`/`load_terms`, or drop the ACF field entirely and set `show_ui = 1` to edit the term through the standard taxonomy panel. Simplest model, and it matches what the read path already effectively does; requires a migration path for existing posts and a rewrite of the `get_field()` reads.
-- **ACF field as the single source of truth** — keep the field and set `show_in_rest = 0` on the taxonomy so the editor stops round-tripping stale term state, leaving ACF's `save_terms` as the only writer. Keeps the curated editor UX, but leaves two stores in place.
+The alternative — keeping the ACF field and setting `show_in_rest = 0` so the editor stops round-tripping — was implemented on a parallel branch and compared in the editor. It was not taken: it preserves the curated radio but leaves two stores in place, so it manages the ambiguity rather than removing it.
 
-The first is the better default unless the sidebar radio UX is non-negotiable. Either way this should be settled before more logic is layered on top of fund type.
+No data migration was needed. `load_terms = 1` meant `get_field( 'fund-type-term' )` already resolved through the taxonomy, so the taxonomy was the de facto store before this change as well as after it. The `fund-type-term` meta rows are left behind on existing Funds; nothing reads them and they can be cleaned up at leisure.
+
+### What changed in code
+
+`ucscgiving_link_filter()` reads `has_term( 'Standard', 'fund-type', $post->ID )` instead of `get_field()` + `get_term()`. That removed the `WP_Error` and `instanceof WP_Term` guards along with their tests, and with them the last need for the `WP_Term` and `WP_Error` doubles in `tests/doubles/` — the harness got smaller.
+
+### What it costs
+
+WordPress renders a hierarchical taxonomy as a **checkbox list**, not a radio. An editor can therefore tick Standard *and* Priority on the same Fund, where the ACF field structurally could not; `has_term()` then matches and the fund links out. `LinkFilterTest::test_links_out_when_standard_is_one_of_several_terms()` pins that behaviour rather than pretending it cannot happen. If it becomes a real problem, the options are a `save_post` guard or a custom `meta_box_cb` rendering radios.
+
+Also new to the admin, both by-products of `show_ui`: a **Fund Types** submenu for term management, and a fund-type control in Quick Edit.
+
+`tests/php/FundTypeSourceOfTruthTest.php` asserts that no ACF field in the Fund Details group targets the `fund-type` taxonomy, since `acf-json/` is round-tripped through the ACF admin and adding one back would reinstate the second writer silently.
+
+### Still hand-verified
+
+The save cycle itself. The PHPUnit suite stubs WordPress, so nothing automated exercises `handle_terms()` — changing a Fund's type and saving once has to be checked against an install with ACF Pro and the `ucsc-2022` theme active. See §3.
 
 ## 2. Reduce coupling to the `ucsc-2022` theme
 
@@ -64,7 +74,7 @@ The middle option also gives the existing settings page a reason to exist beyond
 **Largely done.** [#127](https://github.com/ucsc/ucsc-giving-functionality/pull/130) and [#128](https://github.com/ucsc/ucsc-giving-functionality/pull/131) landed on 2026-08-04. What exists now:
 
 - **PR checks.** `.github/workflows/ci.yml` runs `composer lint` and `composer test` on every pull request, across PHP 8.1 and 8.4. Previously `release.yml` only fired on tags, so nothing validated a PR at all.
-- **A PHPUnit suite** — 24 tests over `ucscgiving_link_filter()` (all six branches), `ucscgiving_fund_url()`, `ucscgiving_fund_search_template()`, `ucscgiving_create_fund_search_variation()` and the two ACF JSON points.
+- **A PHPUnit suite** — 36 tests over `ucscgiving_link_filter()` (every branch), `ucscgiving_build_fund_url()`, `ucscgiving_fund_url()`, `ucscgiving_fund_search_template()`, `ucscgiving_create_fund_search_variation()`, the two ACF JSON points, and the fund-type source-of-truth invariants from §1.
 
 ### Why the tests stub WordPress rather than run inside it
 

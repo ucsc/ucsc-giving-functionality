@@ -73,6 +73,12 @@ function ucscgiving_fund_url() {
  * Funds with a "Standard" fund type link out to the external giving site
  * rather than to their own single post. Everything else is left untouched.
  *
+ * Fund type is read straight from the `fund-type` taxonomy, which is the only
+ * place it is stored. It used to be read through the ACF field
+ * `fund-type-term`, which resolved through the taxonomy anyway because the
+ * field had `load_terms` on — the field was removed in #3 so that exactly one
+ * system owns the value.
+ *
  * @param string  $post_link The post's permalink.
  * @param WP_Post $post      The post being linked to.
  * @return string The external giving URL, or the unmodified permalink.
@@ -84,15 +90,9 @@ function ucscgiving_link_filter( $post_link, $post ) {
 
 	// Read against $post->ID rather than loop state, so this is correct in
 	// admin list tables, REST responses and feeds as well as the main loop.
-	$fund_id = get_field( 'fund-type-term', $post->ID );
-
-	if ( empty( $fund_id ) ) {
-		return $post_link;
-	}
-
-	$fund = get_term( $fund_id );
-
-	if ( is_wp_error( $fund ) || ! $fund instanceof WP_Term || 'Standard' !== $fund->name ) {
+	// has_term() matches on name, slug or term ID, so the "Standard" term
+	// still matches if its slug and name drift apart.
+	if ( ! has_term( 'Standard', 'fund-type', $post->ID ) ) {
 		return $post_link;
 	}
 

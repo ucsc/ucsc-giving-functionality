@@ -161,28 +161,24 @@ if ( ! function_exists( 'get_the_ID' ) ) {
 }
 // phpcs:enable WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid
 
-if ( ! function_exists( 'get_term' ) ) {
+if ( ! function_exists( 'has_term' ) ) {
 	/**
-	 * Term lookup stand-in.
+	 * Object-term lookup stand-in.
 	 *
-	 * @param int    $term_id  Term ID.
-	 * @param string $taxonomy Taxonomy name.
-	 * @return mixed
-	 */
-	function get_term( $term_id, $taxonomy = '' ) {
-		return UCSCGiving_Test_State::$terms[ $term_id ] ?? null;
-	}
-}
-
-if ( ! function_exists( 'is_wp_error' ) ) {
-	/**
-	 * Whether the given value is a WP_Error.
+	 * Matches on term name, which is all the plugin asks for. Real has_term()
+	 * also accepts a slug or a term ID, and takes a post object as well as an
+	 * ID; both are handled here so the stub cannot pass for the wrong reason.
 	 *
-	 * @param mixed $thing Value to check.
+	 * @param string          $term     Term name.
+	 * @param string          $taxonomy Taxonomy name.
+	 * @param int|object|null $post     Post ID or post object.
 	 * @return bool
 	 */
-	function is_wp_error( $thing ) {
-		return $thing instanceof WP_Error;
+	function has_term( $term = '', $taxonomy = '', $post = null ) {
+		$post_id = is_object( $post ) ? $post->ID : (int) $post;
+		$names   = UCSCGiving_Test_State::$object_terms[ $post_id . ':' . $taxonomy ] ?? array();
+
+		return in_array( $term, $names, true );
 	}
 }
 
