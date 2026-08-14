@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-See @README for project overview
+See @README.md for project overview
 
 ## Roadmap management
 
