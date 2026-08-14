@@ -66,7 +66,8 @@ Both paths compose that URL through **`ucscgiving_build_fund_url( $post_id )`** 
 Two consequences worth remembering:
 
 -   **A fund is Standard or Priority, never both**, and two separate things keep it that way. `lib/js/fund-type-radio.js` replaces the editor's checkbox list with a radio via the `editor.PostTaxonomyType` filter — the only supported route, since core registers taxonomy meta boxes with `__back_compat_meta_box => true` unconditionally and the block editor therefore ignores `meta_box_cb`. `ucscgiving_enforce_single_fund_type()` on `set_object_terms` covers everything the editor does not: Quick Edit, Bulk Edit, REST, WP-CLI. Use `set_object_terms`, **not `save_post`** — the REST controller fires `save_post` before `handle_terms()` writes the terms.
--   `acf-json/` round-trips through the ACF admin UI, so a re-export could silently add a field back. `tests/php/FundTypeSourceOfTruthTest.php` asserts against the JSON to catch that.
+-   **A new fund defaults to `Priority`**, via the taxonomy's `default_term`. WordPress resolves that with `term_exists( name, taxonomy )` and creates a new term when it misses, so renaming the `Priority` term without updating `acf-json/` produces a duplicate rather than an error.
+-   `acf-json/` round-trips through the ACF admin UI, so a re-export could silently add a field back. `tests/php/FundTypeSourceOfTruthTest.php` asserts against the JSON to catch that, along with the default term.
 
 ### Templates are block markup, not PHP
 

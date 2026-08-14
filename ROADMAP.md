@@ -50,6 +50,8 @@ A fund is Standard *or* Priority, never both. The ACF radio enforced that struct
 
 **Everywhere else**, `ucscgiving_enforce_single_fund_type()` on `set_object_terms` trims fund-type to one term. Quick Edit and Bulk Edit still render checkboxes, and REST clients, WP-CLI and imports never touch the admin at all. `set_object_terms` is the hook rather than `save_post` because `WP_REST_Posts_Controller::update_item()` runs `wp_update_post()` — and therefore `save_post` — *before* `handle_terms()` writes the terms; it would inspect the terms before they existed. This is a normaliser over the single store, not a third writer arbitrating between two.
 
+**A new fund starts as Priority.** The old ACF radio had `allow_null: 0` and preselected; a radio over a taxonomy shows nothing until a term exists, so the taxonomy carries a `default_term` of `Priority`. Priority is the safe half of the pair — a brand-new fund keeps its own page rather than pointing visitors at an external giving form before it has a designation code. Note that WordPress resolves this with `term_exists( name, taxonomy )` and creates a new term on a miss, so the name must keep matching the existing term exactly; `FundTypeSourceOfTruthTest` asserts it. A side effect worth knowing: core will not let a default term be deleted from the Fund Types screen.
+
 Also new to the admin, both by-products of `show_ui`: a **Fund Types** submenu for term management, and a fund-type control in Quick Edit.
 
 `tests/php/FundTypeSourceOfTruthTest.php` asserts that no ACF field in the Fund Details group targets the `fund-type` taxonomy, since `acf-json/` is round-tripped through the ACF admin and adding one back would reinstate the second writer silently.
@@ -81,7 +83,7 @@ The middle option also gives the existing settings page a reason to exist beyond
 **Largely done.** [#127](https://github.com/ucsc/ucsc-giving-functionality/pull/130) and [#128](https://github.com/ucsc/ucsc-giving-functionality/pull/131) landed on 2026-08-04. What exists now:
 
 - **PR checks.** `.github/workflows/ci.yml` runs `composer lint` and `composer test` on every pull request, across PHP 8.1 and 8.4. Previously `release.yml` only fired on tags, so nothing validated a PR at all.
-- **A PHPUnit suite** — 43 tests over `ucscgiving_link_filter()` (every branch), `ucscgiving_build_fund_url()`, `ucscgiving_fund_url()`, `ucscgiving_fund_search_template()`, `ucscgiving_create_fund_search_variation()`, `ucscgiving_enforce_single_fund_type()`, the two ACF JSON points, and the fund-type source-of-truth invariants from §1. Nothing covers `lib/js/fund-type-radio.js`; see §1.
+- **A PHPUnit suite** — 44 tests over `ucscgiving_link_filter()` (every branch), `ucscgiving_build_fund_url()`, `ucscgiving_fund_url()`, `ucscgiving_fund_search_template()`, `ucscgiving_create_fund_search_variation()`, `ucscgiving_enforce_single_fund_type()`, the two ACF JSON points, and the fund-type source-of-truth invariants from §1. Nothing covers `lib/js/fund-type-radio.js`; see §1.
 
 ### Why the tests stub WordPress rather than run inside it
 
