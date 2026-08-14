@@ -65,11 +65,14 @@
     "query_var": "post_type_key",
     "query_var_name": "",
     "default_term": {
-        "default_term_enabled": "0"
+        "default_term_enabled": "1",
+        "default_term_name": "Priority",
+        "default_term_slug": "",
+        "default_term_description": ""
     },
     "sort": 0,
     "meta_box": "default",
     "meta_box_cb": "",
     "meta_box_sanitize_cb": "",
-    "modified": 1786718878
+    "modified": 1786723638
 }

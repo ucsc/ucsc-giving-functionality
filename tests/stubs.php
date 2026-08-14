@@ -165,20 +165,92 @@ if ( ! function_exists( 'has_term' ) ) {
 	/**
 	 * Object-term lookup stand-in.
 	 *
-	 * Matches on term name, which is all the plugin asks for. Real has_term()
-	 * also accepts a slug or a term ID, and takes a post object as well as an
-	 * ID; both are handled here so the stub cannot pass for the wrong reason.
+	 * Matches a term name against the values and a term ID against the keys,
+	 * mirroring core's name-or-slug-or-ID behaviour. Takes a post object as
+	 * well as an ID, so the stub cannot pass for the wrong reason.
 	 *
-	 * @param string          $term     Term name.
+	 * @param string|int      $term     Term name or term ID.
 	 * @param string          $taxonomy Taxonomy name.
 	 * @param int|object|null $post     Post ID or post object.
 	 * @return bool
 	 */
 	function has_term( $term = '', $taxonomy = '', $post = null ) {
-		$post_id = is_object( $post ) ? $post->ID : (int) $post;
-		$names   = UCSCGiving_Test_State::$object_terms[ $post_id . ':' . $taxonomy ] ?? array();
+		$post_id  = is_object( $post ) ? $post->ID : (int) $post;
+		$assigned = UCSCGiving_Test_State::$object_terms[ $post_id . ':' . $taxonomy ] ?? array();
 
-		return in_array( $term, $names, true );
+		if ( is_int( $term ) ) {
+			return array_key_exists( $term, $assigned );
+		}
+
+		return in_array( $term, array_values( $assigned ), true );
+	}
+}
+
+if ( ! function_exists( 'wp_get_object_terms' ) ) {
+	/**
+	 * Object-term list stand-in.
+	 *
+	 * Only the 'ids' field is modelled, which is all the plugin asks for.
+	 *
+	 * @param int    $object_id Object ID.
+	 * @param string $taxonomy  Taxonomy name.
+	 * @param array  $args      Query arguments.
+	 * @return array
+	 */
+	function wp_get_object_terms( $object_id, $taxonomy, $args = array() ) {
+		$assigned = UCSCGiving_Test_State::$object_terms[ $object_id . ':' . $taxonomy ] ?? array();
+
+		if ( isset( $args['fields'] ) && 'ids' === $args['fields'] ) {
+			return array_keys( $assigned );
+		}
+
+		return $assigned;
+	}
+}
+
+if ( ! function_exists( 'wp_set_object_terms' ) ) {
+	/**
+	 * Object-term write stand-in.
+	 *
+	 * Records the call and applies it to the assigned terms, so a caller that
+	 * writes and then re-reads sees its own write.
+	 *
+	 * It also fires the one hook core fires from here. add_action() is a no-op
+	 * in this harness, so without this the plugin's set_object_terms callback
+	 * would never re-enter and nothing would test that its corrective write
+	 * settles instead of cascading.
+	 *
+	 * Term names are not recoverable from IDs alone, so the previous name is
+	 * carried over where it is known and an empty string used otherwise.
+	 *
+	 * @param int    $object_id Object ID.
+	 * @param array  $terms     Term IDs to set.
+	 * @param string $taxonomy  Taxonomy name.
+	 * @param bool   $append    Whether to append rather than replace.
+	 * @return array The term IDs now assigned.
+	 */
+	function wp_set_object_terms( $object_id, $terms, $taxonomy, $append = false ) {
+		UCSCGiving_Test_State::$term_writes[] = array( $object_id, $terms, $taxonomy, $append );
+
+		$key      = $object_id . ':' . $taxonomy;
+		$existing = UCSCGiving_Test_State::$object_terms[ $key ] ?? array();
+		$updated  = $append ? $existing : array();
+
+		foreach ( (array) $terms as $term_id ) {
+			$updated[ (int) $term_id ] = $existing[ (int) $term_id ] ?? '';
+		}
+
+		UCSCGiving_Test_State::$object_terms[ $key ] = $updated;
+
+		$tt_ids = array_keys( $updated );
+
+		// Stands in for do_action( 'set_object_terms', … ) at the end of core's
+		// wp_set_object_terms().
+		if ( function_exists( 'ucscgiving_enforce_single_fund_type' ) ) {
+			ucscgiving_enforce_single_fund_type( $object_id, $terms, $tt_ids, $taxonomy );
+		}
+
+		return $tt_ids;
 	}
 }
 

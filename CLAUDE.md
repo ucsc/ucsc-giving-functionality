@@ -65,8 +65,9 @@ Both paths compose that URL through **`ucscgiving_build_fund_url( $post_id )`** 
 
 Two consequences worth remembering:
 
--   Fund type is a **checkbox list** in the editor, so a Fund can carry both `Standard` and `Priority`. `has_term()` matches and the fund links out. Deliberate trade-off, pinned by a test in `tests/php/LinkFilterTest.php`.
--   `acf-json/` round-trips through the ACF admin UI, so a re-export could silently add a field back. `tests/php/FundTypeSourceOfTruthTest.php` asserts against the JSON to catch that.
+-   **A fund is Standard or Priority, never both**, and two separate things keep it that way. `lib/js/fund-type-radio.js` replaces the editor's checkbox list with a radio via the `editor.PostTaxonomyType` filter — the only supported route, since core registers taxonomy meta boxes with `__back_compat_meta_box => true` unconditionally and the block editor therefore ignores `meta_box_cb`. `ucscgiving_enforce_single_fund_type()` on `set_object_terms` covers everything the editor does not: Quick Edit, Bulk Edit, REST, WP-CLI. Use `set_object_terms`, **not `save_post`** — the REST controller fires `save_post` before `handle_terms()` writes the terms.
+-   **A new fund defaults to `Priority`**, via the taxonomy's `default_term`. WordPress resolves that with `term_exists( name, taxonomy )` and creates a new term when it misses, so renaming the `Priority` term without updating `acf-json/` produces a duplicate rather than an error.
+-   `acf-json/` round-trips through the ACF admin UI, so a re-export could silently add a field back. `tests/php/FundTypeSourceOfTruthTest.php` asserts against the JSON to catch that, along with the default term.
 
 ### Templates are block markup, not PHP
 
@@ -81,8 +82,9 @@ Two consequences:
 
 -   **Prefix everything `ucscgiving_`** — functions, hooks, globals. PHPCS enforces this via `WordPress.NamingConventions.PrefixAllGlobals`.
 -   **Text domain is `ucscgiving`** — enforced by PHPCS; a missing domain is a lint error.
--   PHPCS ruleset is `WordPress-Extra` + `WordPress-Docs`. The scan is **restricted to `extensions="php"`** because WPCS 3.x dropped its JS/CSS sniffs — do not re-widen it or `.css`/`.js` files will produce noise.
+-   PHPCS ruleset is `WordPress-Extra` + `WordPress-Docs`. The scan is **restricted to `extensions="php"`** because WPCS 3.x dropped its JS/CSS sniffs — do not re-widen it or `.css`/`.js` files will produce noise. Consequence: **nothing lints `lib/js/`** — there is no ESLint config and no JS lint script. Match the surrounding style by hand.
 -   WordPress tabs for indentation in PHP, despite the `.editorconfig` (which is 4-space and applies mainly to non-PHP files).
+-   **Asset enqueues belong in `plugin.php`.** Both of them build their URL with `plugin_dir_url( __FILE__ )`, which resolves to the plugin root only because `plugin.php` sits there. The same call from `lib/functions/` silently yields a broken URL — it would need `plugins_url( …, UCSCGIVING_PLUGIN_DIR . 'plugin.php' )` instead.
 
 ## Releases
 

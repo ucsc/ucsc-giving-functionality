@@ -62,6 +62,63 @@ if ( ! function_exists( 'ucscgiving_enqueue_admin_styles' ) ) {
 }
 add_action( 'admin_enqueue_scripts', 'ucscgiving_enqueue_admin_styles' );
 
+// Enqueue the block editor script that makes Fund Type a single choice.
+if ( ! function_exists( 'ucscgiving_enqueue_block_editor_assets' ) ) {
+	/**
+	 * Enqueue block editor assets for the Fund post type
+	 *
+	 * Loads the script that swaps the Fund Type checkbox list for radio
+	 * buttons. Only the fund editor needs it, so every other screen is left
+	 * alone.
+	 *
+	 * Both this and ucscgiving_enqueue_admin_styles() build their URL with
+	 * plugin_dir_url( __FILE__ ), which resolves to the plugin root only
+	 * because this file sits there. Moving either into lib/functions/ would
+	 * silently produce a broken URL.
+	 *
+	 * @since 0.5.9
+	 * @package ucsc-giving-functionality
+	 */
+	function ucscgiving_enqueue_block_editor_assets(): void {
+		$current_screen = get_current_screen();
+
+		// get_current_screen() returns null outside a real admin screen.
+		if ( ! $current_screen instanceof WP_Screen ) {
+			return;
+		}
+
+		if ( 'fund' !== $current_screen->post_type ) {
+			return;
+		}
+
+		$script         = plugin_dir_url( __FILE__ ) . 'lib/js/fund-type-radio.js';
+		$plugin_data    = get_plugin_data( UCSCGIVING_PLUGIN_DIR . 'plugin.php' );
+		$plugin_version = $plugin_data['Version'];
+
+		wp_register_script(
+			'ucscgiving-fund-type-radio',
+			$script,
+			array( 'wp-hooks', 'wp-element', 'wp-components', 'wp-data', 'wp-core-data' ),
+			$plugin_version,
+			true
+		);
+
+		// Translatable strings stay in PHP, where the ucscgiving text domain is
+		// already enforced, rather than needing script translations.
+		wp_localize_script(
+			'ucscgiving-fund-type-radio',
+			'ucscgivingFundType',
+			array(
+				'taxonomy' => 'fund-type',
+				'label'    => __( 'Fund Type', 'ucscgiving' ),
+			)
+		);
+
+		wp_enqueue_script( 'ucscgiving-fund-type-radio' );
+	}
+}
+add_action( 'enqueue_block_editor_assets', 'ucscgiving_enqueue_block_editor_assets' );
+
 /**
  * ACF JSON Save Point
  *

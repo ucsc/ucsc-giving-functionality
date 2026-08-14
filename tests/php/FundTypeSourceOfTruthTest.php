@@ -86,6 +86,29 @@ class FundTypeSourceOfTruthTest extends TestCase {
 	}
 
 	/**
+	 * A new fund starts as Priority.
+	 *
+	 * The old ACF radio had `allow_null: 0` and preselected a value; a radio
+	 * over the taxonomy shows nothing selected until a term exists. The
+	 * taxonomy's own default term restores that, and Priority is the safe
+	 * default of the two — it keeps the fund on its own page rather than
+	 * sending visitors to an external giving form for a fund that has no
+	 * designation code yet.
+	 *
+	 * The name has to match the existing term exactly. WordPress resolves the
+	 * default with term_exists( name, taxonomy ) and creates a **new** term
+	 * when it misses, so a typo here silently produces a duplicate.
+	 *
+	 * @return void
+	 */
+	public function test_a_new_fund_defaults_to_priority() {
+		$taxonomy = $this->fund_type_taxonomy();
+
+		$this->assertSame( '1', $taxonomy['default_term']['default_term_enabled'] );
+		$this->assertSame( 'Priority', $taxonomy['default_term']['default_term_name'] );
+	}
+
+	/**
 	 * The front end still needs the taxonomy public and queryable.
 	 *
 	 * `taxonomy-fund-type.php` is a registered block template and /fund-type/

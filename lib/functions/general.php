@@ -110,6 +110,57 @@ function ucscgiving_link_filter( $post_link, $post ) {
 add_filter( 'post_type_link', 'ucscgiving_link_filter', 10, 2 );
 
 /**
+ * Keep a fund to a single fund type
+ *
+ * A fund is either Standard or Priority, never both. The block editor is held
+ * to that by lib/js/fund-type-radio.js, but quick edit and bulk edit still
+ * render checkboxes, and REST clients, WP-CLI and imports bypass the admin
+ * entirely. This enforces the invariant where none of them can get around it.
+ *
+ * This is a normaliser over the one store that owns fund type, not a third
+ * writer arbitrating between two of them — the arrangement #3 removed and
+ * PR #21 was closed for reproducing.
+ *
+ * `set_object_terms` is the hook rather than `save_post` because
+ * WP_REST_Posts_Controller::update_item() runs wp_update_post() — and so
+ * `save_post` — *before* handle_terms() writes the terms. This one fires from
+ * inside wp_set_object_terms() itself, so it sees every write path alike.
+ *
+ * That does mean the corrective write re-enters this function. No reentrancy
+ * flag is needed: the write always sets exactly one term, and both count
+ * guards below bail on one term, so the second pass stops there. Those guards
+ * are load-bearing, not just an early-out — weaken both and this recurses
+ * until PHP runs out of memory.
+ *
+ * @param int    $object_id Object ID.
+ * @param array  $terms     Term IDs or slugs that were set.
+ * @param array  $tt_ids    Term taxonomy IDs that were set.
+ * @param string $taxonomy  Taxonomy slug.
+ * @return void
+ */
+function ucscgiving_enforce_single_fund_type( $object_id, $terms, $tt_ids, $taxonomy ) {
+	if ( 'fund-type' !== $taxonomy || count( $tt_ids ) < 2 ) {
+		return;
+	}
+
+	$term_ids = wp_get_object_terms( $object_id, 'fund-type', array( 'fields' => 'ids' ) );
+
+	// A WP_Error is not an array, so this covers the failure case too.
+	if ( ! is_array( $term_ids ) || count( $term_ids ) < 2 ) {
+		return;
+	}
+
+	// Which term survives is arbitrary but must be deterministic. With the
+	// radio in place nothing should reach this; the point is only that a fund
+	// is never left in both states.
+	$keep = (int) end( $term_ids );
+
+	wp_set_object_terms( $object_id, array( $keep ), 'fund-type', false );
+}
+
+add_action( 'set_object_terms', 'ucscgiving_enforce_single_fund_type', 10, 4 );
+
+/**
  * Register Search block variation for Fund post type
  * description: Registers a custom block variation for the Fund post type
  *

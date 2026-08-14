@@ -28,11 +28,25 @@ final class UCSCGiving_Test_State {
 	public static $meta = array();
 
 	/**
-	 * Term names assigned to a post, keyed by "{post_id}:{taxonomy}".
+	 * Terms assigned to a post, keyed by "{post_id}:{taxonomy}".
+	 *
+	 * Each entry maps term ID to term name, so one bucket serves both the name
+	 * lookup has_term() does and the ID list wp_get_object_terms() returns.
 	 *
 	 * @var array<string,array<int,string>>
 	 */
 	public static $object_terms = array();
+
+	/**
+	 * Calls made to wp_set_object_terms(), oldest first.
+	 *
+	 * Each entry is array( $object_id, $terms, $taxonomy, $append ). Lets a
+	 * test assert not just the resulting state but whether a write happened
+	 * at all.
+	 *
+	 * @var array<int,array<int,mixed>>
+	 */
+	public static $term_writes = array();
 
 	/**
 	 * Value returned by is_search().
@@ -71,6 +85,7 @@ final class UCSCGiving_Test_State {
 		self::$fields           = array();
 		self::$meta             = array();
 		self::$object_terms     = array();
+		self::$term_writes      = array();
 		self::$is_search        = false;
 		self::$query_vars       = array();
 		self::$located_template = '';

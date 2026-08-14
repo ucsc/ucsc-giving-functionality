@@ -101,7 +101,7 @@ class BuildFundUrlTest extends TestCase {
 	 */
 	public function test_binding_and_permalink_agree_for_a_standard_fund() {
 		UCSCGiving_Test_State::$fields['base_url']          = 'https://give.example.edu/fund/';
-		UCSCGiving_Test_State::$object_terms['7:fund-type'] = array( 'Standard' );
+		UCSCGiving_Test_State::$object_terms['7:fund-type'] = array( 99 => 'Standard' );
 		UCSCGiving_Test_State::$meta['7:designation']       = 'ABC123';
 		UCSCGiving_Test_State::$current_post_id             = 7;
 
