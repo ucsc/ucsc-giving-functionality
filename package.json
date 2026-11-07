@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/ucsc/ucsc-giving-functionality-plugin#readme",
   "devDependencies": {
+    "@ucsantacruz/wordpress-version-updater": "^2.0.0",
     "@wordpress/scripts": "^34.0.0",
     "commit-and-tag-version": "^12.7.1"
   },
@@ -39,7 +40,14 @@
     "LICENSE"
   ],
   "commit-and-tag-version": {
+    "scripts": {
+      "prerelease": "wordpress-version-updater check plugin.php"
+    },
     "bumpFiles": [
+      {
+        "filename": "plugin.php",
+        "updater": "node_modules/@ucsantacruz/wordpress-version-updater/index.js"
+      },
       {
         "filename": "package-lock.json",
         "type": "json"
@@ -47,10 +55,6 @@
       {
         "filename": "package.json",
         "type": "json"
-      },
-      {
-        "filename": "plugin.php",
-        "updater": "wp-plugin-version-updater.js"
       }
     ]
   }
