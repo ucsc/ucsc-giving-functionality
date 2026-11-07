@@ -19,6 +19,7 @@ npm install           # Node dev deps (@wordpress/scripts, commit-and-tag-versio
 composer lint         # PHPCS across the repo
 composer lint-fix     # PHPCBF auto-fix
 composer test         # PHPUnit (needs ext-mbstring)
+npm run test:release  # Node tests for the release version updater
 
 npm run zip           # Build distributable ZIP (wp-scripts plugin-zip)
 npm run dryrun        # Preview version bump + changelog
@@ -27,7 +28,7 @@ npm run release       # Tag a release and update CHANGELOG.md
 
 `composer lint` and `composer test` both run on every pull request via `.github/workflows/ci.yml` (PHP 8.1 and 8.4), alongside a `package` job that builds the distributable ZIP and asserts its contents. `release.yml` still only fires on tags.
 
-**The PHPUnit suite stubs WordPress rather than running inside it.** `tests/bootstrap.php` supplies WordPress stand-ins, so the suite needs no WordPress, no database, no ACF Pro licence and no theme — but it therefore only covers functions that are pure once WordPress is stubbed. There is no wp-env config and no JS test suite, both deliberately; see ROADMAP §3.
+**The PHPUnit suite stubs WordPress rather than running inside it.** `tests/bootstrap.php` supplies WordPress stand-ins, so the suite needs no WordPress, no database, no ACF Pro licence and no theme — but it therefore only covers functions that are pure once WordPress is stubbed. There is no wp-env config and no JS test suite, both deliberately; see ROADMAP §3. The one Node test file, `tests/node/version-updater.test.js`, tests release tooling, not plugin code. See Releases.
 
 Anything touching a running WordPress — block template registration, the ACF JSON round-trip, the fund-type save cycle — still has to be validated by hand against an install with ACF Pro and the `ucsc-2022` theme active.
 
@@ -90,11 +91,13 @@ Two consequences:
 
 Releases are driven by **conventional commits** — `commit-and-tag-version` reads them to decide the bump, so the commit prefix is functional, not cosmetic (`fix:` → patch, `feat:` → minor, `chore:` → no bump).
 
-`npm run release` bumps `package.json`, `package-lock.json`, and the `Version:` header in `plugin.php` (via the custom updater `wp-plugin-version-updater.js`). Pushing a `v*.*.*` tag triggers `.github/workflows/release.yml`, which delegates to the shared `ucsc/actions` workflow and publishes `ucsc-giving-functionality-plugin.zip`.
+`npm run release` bumps `package.json`, `package-lock.json`, and the `Version:` header in `plugin.php`. The dev dependency [`@ucsantacruz/wordpress-version-updater`](https://github.com/ucsc/wordpress-version-updater) updates the header (#149). commit-and-tag-version loads a string `updater` as a file path, not as a package name. Thus the `bumpFiles` entry is `node_modules/@ucsantacruz/wordpress-version-updater/index.js`. Pushing a `v*.*.*` tag triggers `.github/workflows/release.yml`, which delegates to the shared `ucsc/actions` workflow and publishes `ucsc-giving-functionality-plugin.zip`.
 
 Paths in the `files` array of `package.json` ship in the ZIP: `acf-json/`, `lib/`, `plugin.php`, `README.md`, `CHANGELOG.md`, `LICENSE`. **`package.json` itself also ships** — npm-packlist always includes it regardless of `files`, so it cannot be excluded. `ci.yml` asserts the full contents on every PR.
 
-The updater parses the header with a single regex covering multi-digit segments and an optional prerelease suffix, and throws rather than writing if the header is missing — keep both `readVersion` and `writeVersion` on that shared pattern so they cannot diverge.
+A bad header stops the release, so `plugin.php` cannot drift from `package.json`. The `prerelease` script runs `wordpress-version-updater check plugin.php` before the release writes a file. If the package or the `Version:` line is missing, the release stops. The updater exits with code 1 and does not throw. commit-and-tag-version changes a thrown updater error into a warning and continues the release. Lifecycle scripts do not run with `--dry-run`, so `npm run dryrun` only writes a warning.
+
+`npm run test:release` runs `tests/node/version-updater.test.js` with the built-in `node:test` runner. The `package` job in `ci.yml` runs it on every PR. The tests compare the `plugin.php` header with `package.json` and `package-lock.json`. They write multi-digit and `-rc.N` versions, and they assert the `bumpFiles` and `prerelease` configuration. The file needs no test dependencies and tests only release tooling. It is not the JS test suite that the ROADMAP rules out.
 
 ## Related
 

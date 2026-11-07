@@ -62,7 +62,7 @@ Uses `commit-and-tag-version` for automated releases, driven by **conventional c
 npm run release        # Create new version tag and update CHANGELOG.md
 npm run dryrun         # Preview version bump and changelog changes
 ```
-The custom updater `wp-plugin-version-updater.js` bumps the `Version:` header in `plugin.php` in addition to `package.json` and `package-lock.json`.
+The dev dependency `@ucsantacruz/wordpress-version-updater` bumps the `Version:` header in `plugin.php` in addition to `package.json` and `package-lock.json`. Its `bumpFiles` entry is the path `node_modules/@ucsantacruz/wordpress-version-updater/index.js`. If the header or the package is missing, the `prerelease` script (`wordpress-version-updater check plugin.php`) stops the release. `npm run test:release` tests this configuration, and CI runs it on every PR.
 
 ### Code Standards
 ```bash
@@ -122,7 +122,7 @@ Fund search results are returned using the archive template via `ucscgiving_fund
 - **Field changes**: Manage via ACF admin (auto-exports to `acf-json/`)
 - **Styling**: Admin CSS in `lib/css/admin-settings.css`
 - **Block editor behavior**: `lib/js/fund-type-radio.js`, enqueued from `plugin.php`
-- **Version bumping**: `wp-plugin-version-updater.js` + `package.json` `commit-and-tag-version` config
+- **Version bumping**: `@ucsantacruz/wordpress-version-updater` + `package.json` `commit-and-tag-version` config, tested by `tests/node/version-updater.test.js`
 
 ## Dependencies
 - WordPress 6.5+ (required for Block Bindings API via `register_block_bindings_source`)
