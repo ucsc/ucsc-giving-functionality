@@ -9,6 +9,7 @@
   "scripts": {
     "release": "commit-and-tag-version",
     "dryrun": "commit-and-tag-version --dry-run",
+    "test:release": "node --test tests/node/version-updater.test.js",
     "zip": "wp-scripts plugin-zip",
     "packages-update": "wp-scripts packages-update"
   },

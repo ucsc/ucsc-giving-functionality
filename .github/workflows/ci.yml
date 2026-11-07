@@ -7,6 +7,9 @@
 # WordPress install, database, ACF Pro licence or ucsc-2022 theme is needed
 # here. See issue #129 for why full integration testing is out of scope.
 #
+# The package job also runs `npm run test:release`, the Node tests for the
+# release version updater (tests/node/).
+#
 # The package job guards the distributable. `plugin-zip` is the only thing used
 # from @wordpress/scripts, so a dependency bump that breaks it would otherwise
 # only surface when a release tag is pushed.
@@ -81,6 +84,12 @@ jobs:
             # package-lock.json has drifted out of sync with package.json.
             - name: Install Node dependencies
               run: npm ci
+
+            # The release bumps the plugin.php header through
+            # @ucsantacruz/wordpress-version-updater. A failure here would
+            # otherwise only show when someone runs `npm run release`.
+            - name: Test the release version updater
+              run: npm run test:release
 
             - name: Build the distributable ZIP
               run: npm run zip
